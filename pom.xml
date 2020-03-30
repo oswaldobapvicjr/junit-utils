@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.obvj</groupId>
+    <artifactId>junit-utils</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>junit-utils</name>
+    <description>Common utilities for working with JUnit</description>
+    <url>https://obvj.net/junit-utils</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Oswaldo Baptista Vicente Junior</name>
+            <email>oswaldo.bapvic.jr@outlook.com</email>
+            <organizationUrl>https://obvj.net</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/oswaldobapvicjr/junit-utils</url>
+        <connection>scm:git:git://github.com/oswaldobapvicjr/junit-utils.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/oswaldobapvicjr/junit-utils.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit4.version>4.5</junit4.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit4.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
