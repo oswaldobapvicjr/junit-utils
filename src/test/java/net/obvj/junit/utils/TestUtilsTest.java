@@ -1,10 +1,12 @@
-package net.obvj.smart;
+package net.obvj.junit.utils;
 
 import static org.junit.Assert.fail;
 
 import java.util.function.Supplier;
 
 import org.junit.Test;
+
+import net.obvj.junit.utils.TestUtils;
 
 /**
  * Unit tests for the {@link TestUtils} class.

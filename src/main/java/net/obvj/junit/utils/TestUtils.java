@@ -1,4 +1,4 @@
-package net.obvj.smart;
+package net.obvj.junit.utils;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -148,11 +148,14 @@ public class TestUtils
      * A utility method to assert the expected exception thrown by a supplying function.
      * <p>
      * Example of usage:
-     * <p>
-     * <code>
-     * assertException(AgentConfigurationException.class, "Invalid agents file",
-     *           () -> AgentConfiguration.loadAgentsXmlFile("testAgents/timerAgentWithoutName.xml"))
-     * </code>
+     * </p>
+     *
+     * <pre>
+     * {@code
+     * assertException(IllegalArgumentException.class,
+     *         () -> TestSubject.testMethod("param1"))
+     * }
+     * </pre>
      *
      * @param expectedThrowable the expected throwable class
      * @param supplier          the supplying function that throws an exception to be
@@ -168,11 +171,14 @@ public class TestUtils
      * function.
      * <p>
      * Example of usage:
-     * <p>
-     * <code>
-     * assertException(AgentConfigurationException.class, "Invalid agents file",
-     *           () -> AgentConfiguration.loadAgentsXmlFile("testAgents/timerAgentWithoutName.xml"))
-     * </code>
+     * </p>
+     *
+     * <pre>
+     * {@code
+     * assertException(IllegalArgumentException.class, "Invalid argument: param1",
+     *         () -> TestSubject.testMethod("param1"))
+     * }
+     * </pre>
      *
      * @param expectedThrowable the expected throwable class
      * @param expectedMessage   the expected message (if applicable)
@@ -190,11 +196,14 @@ public class TestUtils
      * supplying function.
      * <p>
      * Example of usage:
-     * <p>
-     * <code>
-     * assertException(AgentConfigurationException.class, "Invalid agents file", UnmarshalException.class,
-     *           () -> AgentConfiguration.loadAgentsXmlFile("testAgents/timerAgentWithoutName.xml"))
-     * </code>
+     * </p>
+     *
+     * <pre>
+     * {@code
+     * assertException(MyException.class, "Unable to process the request",
+     *         IllegalStateException.class() -> TestSubject.process("request1"))
+     * }
+     * </pre>
      *
      * @param expectedThrowable the expected throwable class
      * @param expectedMessage   the expected message (if applicable)
@@ -223,10 +232,11 @@ public class TestUtils
      * method).
      * <p>
      * Example of usage:
-     * <p>
-     * <code>
-     * assertException(IllegalStateException.class, () -> agent.start())
-     * </code>
+     * </p>
+     *
+     * <pre>
+     * {@code assertException(IllegalStateException.class, () -> thread.start())}
+     * </pre>
      *
      * @param expectedThrowable the expected throwable class
      * @param runnable          the runnable that produces an exception to be * validated
@@ -242,11 +252,14 @@ public class TestUtils
      * Runnable's {@code run()} method).
      * <p>
      * Example of usage:
-     * <p>
-     * <code>
-     * assertException(IllegalStateException.class, "Agent already started",
-     *           () -> agent.start())
-     * </code>
+     * </p>
+     *
+     * <pre>
+     * {@code
+     * assertException(IllegalStateException.class, "Already started",
+     *         () -> thread.start())
+     * }
+     * </pre>
      *
      * @param expectedThrowable the expected throwable class
      * @param expectedMessage   the expected message (if applicable)
@@ -264,11 +277,14 @@ public class TestUtils
      * Runnable's {@code run()} method).
      * <p>
      * Example of usage:
-     * <p>
-     * <code>
-     * assertException(AgentConfigurationException.class, "Agent already started", IllegalStateException.class,
-     *           () -> agent.start())
-     * </code>
+     * </p>
+     *
+     * <pre>
+     * {@code
+     * assertException(MyException.class, "Already started",
+     *         IllegalStateException.class() -> thread.start())
+     * }
+     * </pre>
      *
      * @param expectedThrowable the expected throwable class
      * @param expectedMessage   the expected message (if applicable)
