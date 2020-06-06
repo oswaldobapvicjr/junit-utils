@@ -6,8 +6,6 @@ import java.util.function.Supplier;
 
 import org.junit.Test;
 
-import net.obvj.junit.utils.TestUtils;
-
 /**
  * Unit tests for the {@link TestUtils} class.
  *
