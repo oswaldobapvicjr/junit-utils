@@ -1,7 +1,10 @@
 package net.obvj.junit.utils;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,13 +16,14 @@ import java.util.function.Supplier;
  * Common utilities for working with unit tests.
  *
  * @author oswaldo.bapvic.jr
- * @since 2.0
  */
 public class TestUtils
 {
     protected static final String EXPECTED_BUT_NOT_THROWN = "Expected but not thrown: \"%s\"";
     private static final String EXPECTED_STRING_NOT_FOUND = "Expected string \"%s\" not found in: \"%s\"";
     private static final String UNEXPECTED_STRING_FOUND = "Unexpected string \"%s\" found in: \"%s\"";
+    private static final String THE_CONSTRUCTOR_IS_NOT_PRIVATE = "The constructor \"%s\" is not private";
+    private static final String INSTANTIATION_WAS_ALLOWED_BY_THE_CONSTRUCTOR = "Instantiation via Reflection was allowed by the constructor \"%s\"";
 
     private TestUtils()
     {
@@ -34,9 +38,9 @@ public class TestUtils
      * @throws ReflectiveOperationException in case of errors getting constructor metadata or
      *                                      instantiating the private constructor
      */
-    public static void assertNoInstancesAllowed(Class<?> targetClass) throws ReflectiveOperationException
+    public static void assertInstantiationNotAllowed(Class<?> targetClass) throws ReflectiveOperationException
     {
-        assertNoInstancesAllowed(targetClass, null);
+        assertInstantiationNotAllowed(targetClass, null);
     }
 
     /**
@@ -50,10 +54,10 @@ public class TestUtils
      * @throws ReflectiveOperationException in case of errors getting constructor metadata or
      *                                      instantiating the private constructor
      */
-    public static void assertNoInstancesAllowed(Class<?> targetClass, Class<? extends Throwable> expectedThrowableClass)
+    public static void assertInstantiationNotAllowed(Class<?> targetClass, Class<? extends Throwable> expectedThrowableClass)
             throws ReflectiveOperationException
     {
-        assertNoInstancesAllowed(targetClass, expectedThrowableClass, null);
+        assertInstantiationNotAllowed(targetClass, expectedThrowableClass, null);
     }
 
     /**
@@ -69,16 +73,22 @@ public class TestUtils
      * @throws ReflectiveOperationException in case of errors getting constructor metadata or
      *                                      instantiating the private constructor
      */
-    public static void assertNoInstancesAllowed(Class<?> targetClass, Class<? extends Throwable> expectedThrowableClass,
+    public static void assertInstantiationNotAllowed(Class<?> targetClass, Class<? extends Throwable> expectedThrowableClass,
             String expectedErrorMessage) throws ReflectiveOperationException
     {
         try
         {
+            // First, check that all constructors are private
+            for (Constructor<?> constructor : targetClass.getDeclaredConstructors())
+            {
+                assertTrue(String.format(THE_CONSTRUCTOR_IS_NOT_PRIVATE, constructor), Modifier.isPrivate(constructor.getModifiers()));
+            }
+
+            // Then, try to create an instance using the default constructor
             Constructor<?> constructor = targetClass.getDeclaredConstructor();
-            assertTrue("Constructor should be private", Modifier.isPrivate(constructor.getModifiers()));
             constructor.setAccessible(true);
             constructor.newInstance();
-            throw new AssertionError("Class was instantiated");
+            throw new AssertionError(String.format(INSTANTIATION_WAS_ALLOWED_BY_THE_CONSTRUCTOR, constructor));
         }
         catch (InvocationTargetException ite)
         {

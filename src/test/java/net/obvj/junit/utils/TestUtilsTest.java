@@ -40,47 +40,48 @@ public class TestUtilsTest
     };
 
     @Test
-    public void checkNoInstancesAllowed_withClassWithPrivateConstructor_suceeds() throws ReflectiveOperationException
+    public void assertInstantiationNotAllowed_withClassWithPrivateConstructor_suceeds()
+            throws ReflectiveOperationException
     {
-        TestUtils.assertNoInstancesAllowed(TestUtils.class);
+        TestUtils.assertInstantiationNotAllowed(TestUtils.class);
     }
 
     @Test
-    public void checkNoInstancesAllowed_withExpectedThrowableAndClassWithPrivateConstructor_suceeds()
+    public void assertInstantiationNotAllowed_withExpectedThrowableAndClassWithPrivateConstructor_suceeds()
             throws ReflectiveOperationException
     {
-        TestUtils.assertNoInstancesAllowed(TestUtils.class, UnsupportedOperationException.class);
+        TestUtils.assertInstantiationNotAllowed(TestUtils.class, UnsupportedOperationException.class);
     }
 
     @Test
-    public void checkNoInstancesAllowed_withAllParamsAndClassWithPrivateConstructor_suceeds()
+    public void assertInstantiationNotAllowed_withAllParamsAndClassWithPrivateConstructor_suceeds()
             throws ReflectiveOperationException
     {
-        TestUtils.assertNoInstancesAllowed(TestUtils.class, UnsupportedOperationException.class, "Utility class");
+        TestUtils.assertInstantiationNotAllowed(TestUtils.class, UnsupportedOperationException.class, "Utility class");
     }
 
     @Test(expected = AssertionError.class)
-    public void checkNoInstancesAllowed_withUnexpectedMessageAndClassWithPrivateConstructor_fails()
+    public void assertInstantiationNotAllowed_withUnexpectedMessageAndClassWithPrivateConstructor_fails()
             throws ReflectiveOperationException
     {
-        TestUtils.assertNoInstancesAllowed(TestUtils.class, UnsupportedOperationException.class, "Invalid message");
+        TestUtils.assertInstantiationNotAllowed(TestUtils.class, UnsupportedOperationException.class, "Invalid message");
     }
 
     @Test(expected = AssertionError.class)
-    public void checkNoInstancesAllowed_withUnexpectedThrowableAndClassWithPrivateConstructor_fails()
+    public void assertInstantiationNotAllowed_withUnexpectedThrowableAndClassWithPrivateConstructor_fails()
             throws ReflectiveOperationException
     {
-        TestUtils.assertNoInstancesAllowed(TestUtils.class, NullPointerException.class, "Utility class");
+        TestUtils.assertInstantiationNotAllowed(TestUtils.class, NullPointerException.class, "Utility class");
     }
 
     @Test
-    public void checkNoInstancesAllowed_classWithPublicConstructor_fails()
+    public void assertInstantiationNotAllowed_classWithPublicConstructor_fails()
     {
-        TestUtils.assertException(AssertionError.class, "Constructor should be private", null, () ->
+        TestUtils.assertException(AssertionError.class, null, null, () ->
         {
             try
             {
-                TestUtils.assertNoInstancesAllowed(String.class, UnsupportedOperationException.class);
+                TestUtils.assertInstantiationNotAllowed(String.class, UnsupportedOperationException.class);
             }
             catch (ReflectiveOperationException e)
             {
@@ -91,13 +92,13 @@ public class TestUtilsTest
     }
 
     @Test
-    public void checkNoInstancesAllowed_classWithPrivateConstructor_fails()
+    public void assertInstantiationNotAllowed_classWithPrivateConstructor_fails()
     {
-        TestUtils.assertException(AssertionError.class, "Class was instantiated", null, () ->
+        TestUtils.assertException(AssertionError.class, null, null, () ->
         {
             try
             {
-                TestUtils.assertNoInstancesAllowed(Runtime.class, UnsupportedOperationException.class);
+                TestUtils.assertInstantiationNotAllowed(Runtime.class, UnsupportedOperationException.class);
             }
             catch (ReflectiveOperationException e)
             {
