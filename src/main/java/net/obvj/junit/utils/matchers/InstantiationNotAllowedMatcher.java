@@ -1,4 +1,4 @@
-package net.obvj.junit.utils.matcher;
+package net.obvj.junit.utils.matchers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -30,7 +30,7 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
  */
-public class InstantiationNotAllowed extends TypeSafeDiagnosingMatcher<Class<?>>
+public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Class<?>>
 {
     /**
      * Creates a matcher that matches if the examined class cannot be instantiated, which is
@@ -45,7 +45,7 @@ public class InstantiationNotAllowed extends TypeSafeDiagnosingMatcher<Class<?>>
     @Factory
     public static Matcher<Class<?>> instantiationNotAllowed()
     {
-        return new InstantiationNotAllowed();
+        return new InstantiationNotAllowedMatcher();
     }
 
     /**

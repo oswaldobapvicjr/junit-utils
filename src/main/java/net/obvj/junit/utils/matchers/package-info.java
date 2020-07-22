@@ -3,4 +3,4 @@
  *
  * @since 1.1.0
  */
-package net.obvj.junit.utils.matcher;
+package net.obvj.junit.utils.matchers;
