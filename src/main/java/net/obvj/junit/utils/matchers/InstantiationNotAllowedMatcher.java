@@ -35,12 +35,14 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
     /**
      * Creates a matcher that matches if the examined class cannot be instantiated, which is
      * particularly useful for utility classes.
-     * <p/>
+     * <p>
      * For example:
      *
      * <pre>
      * assertThat(TestUtils.class, instanceNotAllowed())
      * </pre>
+     *
+     * @return the matcher
      */
     @Factory
     public static Matcher<Class<?>> instantiationNotAllowed()
