@@ -6,10 +6,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.Test;
 
 import net.obvj.junit.utils.TestUtils;
-import net.obvj.junit.utils.matchers.InstantiationNotAllowedMatcher;
 
 /**
- * Unit tests for the {@link InstantiationNotAllowedMatcher} matcher class.
+ * Unit tests for the {@link InstantiationNotAllowedMatcher} class.
  *
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
