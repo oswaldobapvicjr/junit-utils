@@ -11,7 +11,6 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 /**
  * A Matcher that evaluates the content of a string against one or more substrings.
  *
- *
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
  */
@@ -116,12 +115,15 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     /**
      * Creates a matcher that matches if the examined string contains <b>all</b> of the
      * specified substrings (regardless of the order they appear in the string).
-     * <p/>
+     * <p>
      * For example:
      *
      * <pre>
      * assertThat("the quick brown fox", containsAll("fox", "the"))
      * </pre>
+     *
+     * @param substrings the substrings to be tested
+     * @return the matcher
      */
     @Factory
     public static Matcher<String> containsAll(String... substrings)
@@ -132,12 +134,15 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     /**
      * Creates a matcher that matches if the examined string contains <b>any</b> of the
      * specified substrings.
-     * <p/>
+     * <p>
      * For example:
      *
      * <pre>
      * assertThat("the quick brown fox", containsAny("fox", "bird"))
      * </pre>
+     *
+     * @param substrings the substrings to be tested
+     * @return the matcher
      */
     @Factory
     public static Matcher<String> containsAny(String... substrings)
@@ -148,12 +153,15 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     /**
      * Creates a matcher that matches if the examined string contains <b>none</b> of the
      * specified substrings.
-     * <p/>
+     * <p>
      * For example:
      *
      * <pre>
      * assertThat("the quick brown fox", containsNone("cat", "mouse"))
      * </pre>
+     *
+     * @param substrings the substrings to be tested
+     * @return the matcher
      */
     @Factory
     public static Matcher<String> containsNone(String... substrings)
