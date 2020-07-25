@@ -70,7 +70,7 @@ public class ExceptionMatcherTest
     }
 
     @Test(expected = AssertionError.class)
-    public void throwsException_noException_fails()
+    public void throwsException_runnableThrowingNoException_fails()
     {
         assertThat(() -> MESSAGE1.equals(MESSAGE1), throwsException(NullPointerException.class));
     }
@@ -90,21 +90,21 @@ public class ExceptionMatcherTest
     }
 
     @Test(expected = AssertionError.class)
-    public void withCause_noCause_fails()
+    public void withCause_setButNoCause_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withCause(NullPointerException.class));
     }
 
     @Test
-    public void withCauseNull_noCause_succeeds()
+    public void withCause_nullAndNoCause_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withCause(null));
     }
 
     @Test(expected = AssertionError.class)
-    public void withCauseNull_hasCause_fails()
+    public void withCause_nullButHasCause_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class).withCause(null));
@@ -139,28 +139,28 @@ public class ExceptionMatcherTest
     }
 
     @Test(expected = AssertionError.class)
-    public void withMessageContaining_expectedMessageMatchingButIncorrectException_fails()
+    public void withMessageContaining_oneSubstringMatchingButExceptionNotMatching_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalArgumentException.class).withMessageContaining(MESSAGE2));
     }
 
     @Test(expected = AssertionError.class)
-    public void withMessageContaining_setButNoMessage_fails()
+    public void withMessageContaining_oneSubstringButNoMessage_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withMessageContaining(MESSAGE1));
     }
 
     @Test
-    public void withMessageContainingNull_noMessage_succeeds()
+    public void withMessageContaining_nullAndNoMessage_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withMessageContaining((String[]) null));
     }
 
     @Test(expected = AssertionError.class)
-    public void withMessageNull_butHasMessage_fails()
+    public void withMessage_nullButHasMessage_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalArgumentException.class).withMessageContaining((String[]) null));
