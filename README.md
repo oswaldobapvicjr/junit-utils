@@ -31,16 +31,14 @@ To test the exception **message**, add `withMessageContaining`:
 
 ```java
 assertThat(() -> myObject.doStuff(null),
-        throwsException(NullPointerException.class)
-            .withMessageContaining("ERR-120008"));
+        throwsException(NullPointerException.class).withMessageContaining("ERR-120008"));
 ```
 
 If required, you can also test the exception **cause**:
 
 ```java
 assertThat(() -> myObject.doStuff(null),
-        throwsException(MyException.class)
-            .withMessageContaining("ERR-120008")
+        throwsException(MyException.class).withMessageContaining("ERR-120008")
             .withCause(NullPointerException.class));
 ```
 
@@ -59,7 +57,7 @@ The following examples represent some successful assertions using the **StringMa
 ```java
 assertThat("The quick brown fox jumps over the lazy dog", containsAll("fox", "dog"));
 assertThat("The quick brown fox jumps over the lazy dog", containsAny("fox", "dragon"));
-assertThat("The quick brown fox jumps over the lazy dog", containsNo("centaur"));
+assertThat("The quick brown fox jumps over the lazy dog", containsNone("centaur"));
 ```
 
 
