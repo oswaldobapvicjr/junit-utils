@@ -52,7 +52,7 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    public void throwsException_correctExceptionWithNotCause_succeeds()
+    public void throwsException_correctExceptionWithNoCause_succeeds()
     {
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(NullPointerException.class));
     }

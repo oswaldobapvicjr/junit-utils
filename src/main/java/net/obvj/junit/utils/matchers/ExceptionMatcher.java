@@ -176,7 +176,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         {
             return false;
         }
-        return checkCauseFlag && validateCause(exception, mismatch);
+        return !(checkCauseFlag && !validateCause(exception, mismatch));
     }
 
     /**
