@@ -4,11 +4,11 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils)
 [![Javadoc](https://javadoc.io/badge2/net.obvj/junit-utils/javadoc.svg)](https://javadoc.io/doc/net.obvj/junit-utils)
 
-Common utilities for working with JUnit
+Common utilities for working with JUnit.
 
 ## Features
 
-**junit-utils** provides convenient, ready-to-use objects and methods for agile development of the following unit-testing scenarios:
+**junit-utils** provides convenient objects and methods for agile development of the following unit-testing scenarios:
 
 - asserting **exceptions**, as well as exception details, such as message and cause
 - assertion of strings contents
@@ -20,7 +20,7 @@ Common utilities for working with JUnit
 
 ### Asserting exceptions
 
-The following assertion succeeds if the tested method throws a NullPointerException. The **ExceptionMatcher** class is in use:
+The following assertion is true if the examined method throws a NullPointerException. The **ExceptionMatcher** class is in use:
 
 ```java
 assertThat(() -> myObject.doStuff(null),
@@ -44,7 +44,7 @@ assertThat(() -> myObject.doStuff(null),
 
 ### Testing that instantiation is not allowed
 
-The following assertion should be particularly useful for utility classes. The **InstantiationNotAllowedMatcher** class is in use:
+The following assertion is particularly useful for utility classes. The **InstantiationNotAllowedMatcher** class is in use:
 
 ```java
 assertThat(TestUtils.class, instantiationNotAllowed());
