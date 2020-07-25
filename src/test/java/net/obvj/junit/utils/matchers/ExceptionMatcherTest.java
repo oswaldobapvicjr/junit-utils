@@ -15,18 +15,20 @@ import org.junit.Test;
  */
 public class ExceptionMatcherTest
 {
+    private static final String ERR_0001 = "ERR-0001";
     private static final String MESSAGE1 = "message1";
-    private static final String MESSAGE11 = "message11";
+    private static final String MESSAGE2 = "message2";
+    private static final String MESSAGE_ERR_0001_FULL = "[ERR-0001] message1";
     private static final String NULL_STRING = null;
 
     private static final Runnable RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE = () ->
     {
-        throw new IllegalStateException(MESSAGE1);
+        throw new IllegalStateException(MESSAGE_ERR_0001_FULL);
     };
 
     private static final Runnable RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE = () ->
     {
-        throw new IllegalStateException(MESSAGE1, new NullPointerException());
+        throw new IllegalStateException(MESSAGE_ERR_0001_FULL, new NullPointerException());
     };
 
     private static final Runnable RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE = () ->
@@ -39,10 +41,14 @@ public class ExceptionMatcherTest
         throw new IllegalArgumentException();
     };
 
+    // ================================
+    // Test methods - start
+    // ================================
+
     @Test
     public void throwsException_nullWithRunnableNotThrowingException_succeeeds()
     {
-        assertThat(() -> MESSAGE11.contains(MESSAGE1), throwsException(null));
+        assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsException(null));
     }
 
     @Test
@@ -105,24 +111,38 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    public void withMessageContaining_expectedMessageMatching_suceeds()
+    public void withMessageContaining_oneSubstringMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalStateException.class).withMessageContaining(MESSAGE1));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessageContaining_expectedMessageNotMatching_suceeds()
+    @Test
+    public void withMessageContaining_twoSubstringsMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE11));
+                throwsException(IllegalStateException.class).withMessageContaining(ERR_0001, MESSAGE1));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withMessageContaining_oneSubstringNotMatching_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withMessageContaining_twoSubstringsButOneNotMatching_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessageContaining(ERR_0001, MESSAGE2));
     }
 
     @Test(expected = AssertionError.class)
     public void withMessageContaining_expectedMessageMatchingButIncorrectException_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalArgumentException.class).withMessageContaining(MESSAGE11));
+                throwsException(IllegalArgumentException.class).withMessageContaining(MESSAGE2));
     }
 
     @Test(expected = AssertionError.class)
@@ -136,14 +156,14 @@ public class ExceptionMatcherTest
     public void withMessageContainingNull_noMessage_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
-                throwsException(IllegalArgumentException.class).withMessageContaining(null));
+                throwsException(IllegalArgumentException.class).withMessageContaining((String[]) null));
     }
 
     @Test(expected = AssertionError.class)
     public void withMessageNull_butHasMessage_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalArgumentException.class).withMessageContaining(null));
+                throwsException(IllegalArgumentException.class).withMessageContaining((String[]) null));
     }
 
     @Test
@@ -166,7 +186,7 @@ public class ExceptionMatcherTest
     public void withMessageContainingAndCause_matchingCauseButIncorrectMessage_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE11)
+                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2)
                         .withCause(FileNotFoundException.class));
     }
 
@@ -183,6 +203,6 @@ public class ExceptionMatcherTest
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
                 throwsException(IllegalStateException.class).withCause(FileNotFoundException.class)
-                        .withMessageContaining(MESSAGE11));
+                        .withMessageContaining(MESSAGE2));
     }
 }

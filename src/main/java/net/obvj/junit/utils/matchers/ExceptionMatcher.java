@@ -1,5 +1,9 @@
 package net.obvj.junit.utils.matchers;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -17,8 +21,8 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
  * </pre>
  *
  * <p>
- * Exception details, such as message and cause, can also be evaluated using the fluent
- * interface. For example:
+ * Exception details, such as message and cause, can also be evaluated using additional
+ * methods. For example:
  * </p>
  *
  * <pre>
@@ -28,8 +32,8 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
  *             .withCause(FileNotFoundException.class));
  *
  * assertThat(() -> obj.doStuff(null),
- *         throwsException(IllegalArgumentException.class)
- *             .withMessageContaining("argument cannot be null"));
+ *         throwsException(MyException.class)
+ *             .withMessageContaining("ERR-12008"));
  * }
  * </pre>
  *
@@ -46,7 +50,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     private boolean checkMessageFlag = false;
 
     private Class<? extends Throwable> expectedCause;
-    private String expectedMessage;
+    private List<String> expectedMessageSubstrings = Collections.emptyList();
 
 
     /**
@@ -60,7 +64,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     }
 
     /**
-     * Creates a matcher that matches if the examined procedure throws an expected exception.
+     * Creates a matcher that matches if the examined procedure throws a given exception.
      * <p>
      * For example:
      *
@@ -71,17 +75,17 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * }
      * </pre>
      *
-     * @param expectedException the exception to be checked
+     * @param exception the exception to be checked
      * @return the matcher
      */
     @Factory
-    public static ExceptionMatcher throwsException(Class<? extends Exception> expectedException)
+    public static ExceptionMatcher throwsException(Class<? extends Exception> exception)
     {
-        return new ExceptionMatcher(expectedException);
+        return new ExceptionMatcher(exception);
     }
 
     /**
-     * Increments the matcher with an expected cause for evaluation.
+     * Assigns an expected cause for evaluation.
      * <p>
      * For example:
      *
@@ -93,18 +97,18 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * }
      * </pre>
      *
-     * @param expectedCause the cause to be checked
+     * @param cause the cause to be checked
      * @return the matcher, incremented with a given cause for testing
      */
-    public ExceptionMatcher withCause(Class<? extends Throwable> expectedCause)
+    public ExceptionMatcher withCause(Class<? extends Throwable> cause)
     {
-        this.expectedCause = expectedCause;
+        expectedCause = cause;
         checkCauseFlag = true;
         return this;
     }
 
     /**
-     * Increments the matcher with expected message content for evaluation.
+     * Assigns one or more expected substrings for the exception message evaluation.
      * <p>
      * For example:
      *
@@ -113,15 +117,22 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * assertThat(() -> obj.doStuff(null),
      *         throwsException(IllegalArgumentException.class)
      *             .withMessageContaining("argument cannot be null");
+     *
+     * assertThat(() -> obj.doStuff(null),
+     *         throwsException(MyException.class)
+     *             .withMessageContaining("ERR-12008", "mandatory");
      * }
      * </pre>
      *
-     * @param expectedMessage a substring of the exception message to be checked
+     * @param substrings a substring of the exception message to be checked
      * @return the matcher, incremented with a given message for testing
      */
-    public ExceptionMatcher withMessageContaining(String expectedMessage)
+    public ExceptionMatcher withMessageContaining(String... substrings)
     {
-        this.expectedMessage = expectedMessage;
+        if (substrings != null)
+        {
+            expectedMessageSubstrings = Arrays.asList(substrings);
+        }
         checkMessageFlag = true;
         return this;
     }
@@ -144,7 +155,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         }
         catch (Exception exception)
         {
-            return validateException(exception, mismatch);
+            return validateFully(exception, mismatch);
         }
     }
 
@@ -153,6 +164,27 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      *
      * @param exception the exception to be validated
      * @param mismatch  the description to be used for reporting in case of mismatch
+     * @return a flag indicating whether or not the matching has succeeded
+     */
+    private boolean validateFully(Exception exception, Description mismatch)
+    {
+        if (!validateException(exception, mismatch))
+        {
+            return false;
+        }
+        if (checkMessageFlag && !expectedMessageSubstrings.isEmpty() && !validateMessage(exception, mismatch))
+        {
+            return false;
+        }
+        return checkCauseFlag && validateCause(exception, mismatch);
+    }
+
+    /**
+     * Validates the exception class.
+     *
+     * @param exception the exception to be validated
+     * @param mismatch  the description to be used for reporting in case of mismatch
+     * @return a flag indicating whether or not the matching has succeeded
      */
     private boolean validateException(Exception exception, Description mismatch)
     {
@@ -162,34 +194,55 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
                     .appendText(nullSafeClassNameToText(exception.getClass()));
             return false;
         }
-        if (checkMessageFlag && expectedMessage != null)
+        return true;
+    }
+
+    /**
+     * Validates the exception message.
+     *
+     * @param exception the exception which message is to be validated
+     * @param mismatch  the description to be used for reporting in case of mismatch
+     * @return a flag indicating whether or not the matching has succeeded
+     */
+    private boolean validateMessage(Exception exception, Description mismatch)
+    {
+        String message = exception.getMessage();
+        if (message == null)
         {
-            String message = exception.getMessage();
-            if (message == null)
+            mismatch.appendText(NEW_LINE_INDENT).appendText("the message was null");
+            return false;
+        }
+        for (String substring : expectedMessageSubstrings)
+        {
+            if (!message.contains(substring))
             {
-                mismatch.appendText(NEW_LINE_INDENT).appendText("the message was null");
-                return false;
-            }
-            if (!message.contains(expectedMessage))
-            {
-                mismatch.appendText(NEW_LINE_INDENT).appendText("the message was").appendValue(message);
+                mismatch.appendText(NEW_LINE_INDENT).appendText("the message was ").appendValue(message);
                 return false;
             }
         }
-        if (checkCauseFlag)
+        return true;
+    }
+
+    /**
+     * Validates the exception cause.
+     *
+     * @param exception the exception which cause is to be validated
+     * @param mismatch  the description to be used for reporting in case of mismatch
+     * @return a flag indicating whether or not the matching has succeeded
+     */
+    private boolean validateCause(Exception exception, Description mismatch)
+    {
+        Throwable cause = exception.getCause();
+        if (cause == null && expectedCause != null)
         {
-            Throwable cause = exception.getCause();
-            if (cause == null && expectedCause != null)
-            {
-                mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was null");
-                return false;
-            }
-            if (cause != null && !cause.getClass().equals(expectedCause))
-            {
-                mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was: ")
-                        .appendText(nullSafeClassNameToText(cause.getClass()));
-                return false;
-            }
+            mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was null");
+            return false;
+        }
+        if (cause != null && !cause.getClass().equals(expectedCause))
+        {
+            mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was: ")
+                    .appendText(nullSafeClassNameToText(cause.getClass()));
+            return false;
         }
         return true;
     }
@@ -202,10 +255,11 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     @Override
     public void describeTo(Description description)
     {
-        description.appendText(nullSafeClassNameToText(expectedException));
+        description.appendText(NEW_LINE_INDENT).appendText(nullSafeClassNameToText(expectedException));
         if (checkMessageFlag)
         {
-            description.appendText(NEW_LINE_INDENT).appendText("and message containing: ").appendValue(expectedMessage);
+            description.appendText(NEW_LINE_INDENT).appendText("and message containing: ")
+                    .appendText(expectedMessageSubstrings.toString());
         }
         if (checkCauseFlag)
         {
@@ -219,7 +273,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * specified class reference is null.
      *
      * @param clazz the class to be parsed
-     * @return the class canonical name, or the string: {@code "null"}
+     * @return the a string containing either the class canonical name or {@code "null"}
      */
     private String nullSafeClassNameToText(Class<?> clazz)
     {
