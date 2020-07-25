@@ -249,7 +249,7 @@ public class TestUtils
      * </pre>
      *
      * @param expectedThrowable the expected throwable class
-     * @param runnable          the runnable that produces an exception to be * validated
+     * @param runnable          the runnable that produces an exception to be validated
      */
     public static void assertException(Class<? extends Throwable> expectedThrowable, Runnable runnable)
     {
@@ -273,7 +273,7 @@ public class TestUtils
      *
      * @param expectedThrowable the expected throwable class
      * @param expectedMessage   the expected message (if applicable)
-     * @param runnable          the runnable that produces an exception to be * validated
+     * @param runnable          the runnable that produces an exception to be validated
      */
     public static void assertException(Class<? extends Throwable> expectedThrowable, String expectedMessage,
             Runnable runnable)
@@ -299,7 +299,7 @@ public class TestUtils
      * @param expectedThrowable the expected throwable class
      * @param expectedMessage   the expected message (if applicable)
      * @param expectedCause     the expected throwable cause class (if applicable)
-     * @param runnable          the runnable that produces an exception to be * validated
+     * @param runnable          the runnable that produces an exception to be validated
      */
     public static void assertException(Class<? extends Throwable> expectedThrowable, String expectedMessage,
             Class<? extends Throwable> expectedCause, Runnable runnable)
