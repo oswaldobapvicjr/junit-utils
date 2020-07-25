@@ -39,7 +39,7 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * For example:
      *
      * <pre>
-     * assertThat(TestUtils.class, instanceNotAllowed())
+     * assertThat(TestUtils.class, instantiationNotAllowed())
      * </pre>
      *
      * @return the matcher
