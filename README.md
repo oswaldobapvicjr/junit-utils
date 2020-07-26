@@ -56,7 +56,7 @@ The following examples represent some successful assertions using the **StringMa
 
 ```java
 assertThat("The quick brown fox jumps over the lazy dog", containsAll("fox", "dog"));
-assertThat("The quick brown fox jumps over the lazy dog", containsAny("fox", "dragon"));
+assertThat("The quick brown fox jumps over the lazy dog", containsAny("FOX", "dragon").ignoreCase());
 assertThat("The quick brown fox jumps over the lazy dog", containsNone("centaur"));
 ```
 
