@@ -92,8 +92,8 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
          * Execute the matcher business logic.
          *
          * @param string       the string to be evaluated
-         * @param caseStrategy the case strategy to be used
          * @param substrings   the substrings to be checked
+         * @param caseStrategy the case strategy to be used
          * @param mismatch     the description to be used for reporting in case of mismatch
          */
         public abstract boolean evaluate(String string, List<String> substrings, CaseStrategy caseStrategy,
@@ -140,7 +140,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
          * Checks if a string contains a substring.
          *
          * @param string    the string to check
-         * @param substring the string to find
+         * @param substring the substring to find
          * @return {@code true} if the string contains the substring, otherwise {@code false}
          */
         public abstract boolean contains(String string, String substring);
@@ -154,8 +154,9 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     /**
      * Builds this Matcher with a specialized strategy and a list of substrings to be tested.
      *
-     * @param strategy   the evaluation strategy
-     * @param substrings the substrings to be evaluated
+     * @param strategy     the evaluation strategy
+     * @param caseStrategy the case strategy to set
+     * @param substrings   the substrings to be evaluated
      */
     private StringMatcher(Strategy strategy, CaseStrategy caseStrategy, String... substrings)
     {
