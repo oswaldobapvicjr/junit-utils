@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 /**
@@ -32,11 +31,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
         ALL
         {
             @Override
-            public boolean evaluate(String string, List<String> substrings, Description mismatch)
+            public boolean evaluate(String string, List<String> substrings, CaseStrategy caseStrategy,
+                    Description mismatch)
             {
                 for (String substring : substrings)
                 {
-                    if (!string.contains(substring))
+                    if (!caseStrategy.contains(string, substring))
                     {
                         mismatch.appendText(String.format(EXPECTED_STRING_NOT_FOUND, substring, string));
                         return false;
@@ -52,11 +52,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
         ANY
         {
             @Override
-            public boolean evaluate(String string, List<String> substrings, Description mismatch)
+            public boolean evaluate(String string, List<String> substrings, CaseStrategy caseStrategy,
+                    Description mismatch)
             {
                 for (String substring : substrings)
                 {
-                    if (string.contains(substring))
+                    if (caseStrategy.contains(string, substring))
                     {
                         return true;
                     }
@@ -72,11 +73,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
         NONE
         {
             @Override
-            public boolean evaluate(String string, List<String> substrings, Description mismatch)
+            public boolean evaluate(String string, List<String> substrings, CaseStrategy caseStrategy,
+                    Description mismatch)
             {
                 for (String substring : substrings)
                 {
-                    if (string.contains(substring))
+                    if (caseStrategy.contains(string, substring))
                     {
                         mismatch.appendText(String.format(UNEXPECTED_STRING_FOUND, substring, string));
                         return false;
@@ -89,16 +91,65 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
         /**
          * Execute the matcher business logic.
          *
-         * @param string     the string to be evaluated
-         * @param substrings the substrings to be checked
-         * @param mismatch   the description to be used for reporting in case of mismatch
+         * @param string       the string to be evaluated
+         * @param caseStrategy the case strategy to be used
+         * @param substrings   the substrings to be checked
+         * @param mismatch     the description to be used for reporting in case of mismatch
          */
-        public abstract boolean evaluate(String string, List<String> substrings, Description mismatch);
+        public abstract boolean evaluate(String string, List<String> substrings, CaseStrategy caseStrategy,
+                Description mismatch);
+    }
 
+    /**
+     * Defines the case strategy to be used
+     */
+    private enum CaseStrategy
+    {
+        /**
+         * Matches if a string contains a substring, case-sensitive.
+         */
+        DEFAULT("default")
+        {
+            @Override
+            public boolean contains(String string, String substring)
+            {
+                return string != null && substring != null && string.contains(substring);
+            }
+        },
+
+        /**
+         * Matches if a string contains a substring, irrespective of case
+         */
+        IGNORE_CASE("ignore case")
+        {
+            @Override
+            public boolean contains(String string, String substring)
+            {
+                return string != null && substring != null && string.toLowerCase().contains(substring.toLowerCase());
+            }
+        };
+
+        String description;
+
+        private CaseStrategy(String description)
+        {
+            this.description = description;
+        }
+
+        /**
+         * Checks if a string contains a substring.
+         *
+         * @param string    the string to check
+         * @param substring the string to find
+         * @return {@code true} if the string contains the substring, otherwise {@code false}
+         */
+        public abstract boolean contains(String string, String substring);
     }
 
     private final Strategy strategy;
     private final List<String> substrings;
+
+    private CaseStrategy caseStrategy;
 
     /**
      * Builds this Matcher with a specialized strategy and a list of substrings to be tested.
@@ -106,9 +157,10 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
      * @param strategy   the evaluation strategy
      * @param substrings the substrings to be evaluated
      */
-    private StringMatcher(Strategy strategy, String... substrings)
+    private StringMatcher(Strategy strategy, CaseStrategy caseStrategy, String... substrings)
     {
         this.strategy = strategy;
+        this.caseStrategy = caseStrategy;
         this.substrings = Arrays.asList(substrings);
     }
 
@@ -126,9 +178,9 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
      * @return the matcher
      */
     @Factory
-    public static Matcher<String> containsAll(String... substrings)
+    public static StringMatcher containsAll(String... substrings)
     {
-        return new StringMatcher(Strategy.ALL, substrings);
+        return new StringMatcher(Strategy.ALL, CaseStrategy.DEFAULT, substrings);
     }
 
     /**
@@ -145,9 +197,9 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
      * @return the matcher
      */
     @Factory
-    public static Matcher<String> containsAny(String... substrings)
+    public static StringMatcher containsAny(String... substrings)
     {
-        return new StringMatcher(Strategy.ANY, substrings);
+        return new StringMatcher(Strategy.ANY, CaseStrategy.DEFAULT, substrings);
     }
 
     /**
@@ -164,9 +216,20 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
      * @return the matcher
      */
     @Factory
-    public static Matcher<String> containsNone(String... substrings)
+    public static StringMatcher containsNone(String... substrings)
     {
-        return new StringMatcher(Strategy.NONE, substrings);
+        return new StringMatcher(Strategy.NONE, CaseStrategy.DEFAULT, substrings);
+    }
+
+    /**
+     * Tells the matcher to compare strings irrespective of case.
+     *
+     * @return the matcher
+     */
+    public StringMatcher ignoreCase()
+    {
+        caseStrategy = CaseStrategy.IGNORE_CASE;
+        return this;
     }
 
     /**
@@ -179,7 +242,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     @Override
     protected boolean matchesSafely(String string, Description mismatch)
     {
-        return strategy.evaluate(string, substrings, mismatch);
+        return strategy.evaluate(string, substrings, caseStrategy, mismatch);
     }
 
     /**
@@ -191,6 +254,10 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     public void describeTo(Description description)
     {
         description.appendText(String.format(EXPECTED_SCENARIO, strategy, substrings));
+        if (caseStrategy != CaseStrategy.DEFAULT)
+        {
+            description.appendText(" (").appendText(caseStrategy.description).appendText(")");
+        }
     }
 
 }

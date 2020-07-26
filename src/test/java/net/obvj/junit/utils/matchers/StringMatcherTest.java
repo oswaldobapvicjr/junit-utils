@@ -20,6 +20,7 @@ public class StringMatcherTest
     private static final String FOX = "fox";
     private static final String DRAGON = "dragon";
     private static final String MANTICORE = "manticore";
+    private static final String LAZY_UPPER = "LAZY";
 
     @Test
     public void containsAll_allSubstringsFound_suceeds()
@@ -61,6 +62,19 @@ public class StringMatcherTest
     public void containsNone_unexpectedString_fails()
     {
         assertThat(THE_QUICK_BROWN_FOX, containsNone(DRAGON, MANTICORE, DOG));
+    }
+
+    @Test
+    public void ignoreCase_substringMatches_success()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, containsAll(LAZY_UPPER).ignoreCase());
+        assertThat(THE_QUICK_BROWN_FOX, containsAny(LAZY_UPPER).ignoreCase());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void ignoreCase_substringNotMatches_fails()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, containsAll(DRAGON).ignoreCase());
     }
 
 }
