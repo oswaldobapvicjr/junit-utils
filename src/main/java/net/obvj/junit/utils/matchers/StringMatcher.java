@@ -8,12 +8,13 @@ import org.hamcrest.Factory;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 /**
- * A Matcher that evaluates the content of a string against one or more substrings.
+ * A Matcher that evaluates the content of a string of characters against one or more
+ * substrings.
  *
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
  */
-public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
+public class StringMatcher extends TypeSafeDiagnosingMatcher<CharSequence>
 {
     private static final String EXPECTED_SCENARIO = "a string containing %s of the specified substrings %s";
     private static final String EXPECTED_STRING_NOT_FOUND = "the substring \"%s\" was not found in: \"%s\"";
@@ -236,14 +237,15 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     /**
      * Execute the matcher business logic for the specified string.
      *
-     * @param string   the string to be checked
-     * @param mismatch the description to be used for reporting in case of mismatch
+     * @param charSequence the sequence of char values to be checked
+     * @param mismatch     the description to be used for reporting in case of mismatch
      * @return a flag indicating whether or not the matching has succeeded
      */
     @Override
-    protected boolean matchesSafely(String string, Description mismatch)
+    protected boolean matchesSafely(CharSequence charSequence, Description mismatch)
     {
-        return strategy.evaluate(string, substrings, caseStrategy, mismatch);
+        String mainString = charSequence.toString();
+        return strategy.evaluate(mainString, substrings, caseStrategy, mismatch);
     }
 
     /**
