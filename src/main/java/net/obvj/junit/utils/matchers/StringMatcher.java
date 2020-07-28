@@ -225,6 +225,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<CharSequence>
 
     /**
      * Tells the matcher to compare strings irrespective of case.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * assertThat("the quick brown fox", containsAny("FOX").ignoreCase())
+     * </pre>
      *
      * @return the matcher
      */
