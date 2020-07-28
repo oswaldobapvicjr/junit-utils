@@ -51,10 +51,23 @@ public class ExceptionMatcherTest
         assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsException(null));
     }
 
+    @Test(expected = AssertionError.class)
+    public void throwsException_nullWithRunnableThrowingException_fails()
+    {
+        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(null));
+    }
+
     @Test
     public void throwsException_correctExceptionWithNoCause_succeeds()
     {
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(NullPointerException.class));
+    }
+
+    @Test
+    public void throwsException_parentExceptionExpectedAndChildExceptionThrown_succeeds()
+    {
+        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(RuntimeException.class));
+        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(Exception.class));
     }
 
     @Test
@@ -80,6 +93,13 @@ public class ExceptionMatcherTest
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class).withCause(NullPointerException.class));
+    }
+
+    @Test
+    public void withCause_parentCauseExpectedAndIsChildCause_succeeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                throwsException(IllegalArgumentException.class).withCause(RuntimeException.class));
     }
 
     @Test(expected = AssertionError.class)

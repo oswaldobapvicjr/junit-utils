@@ -75,7 +75,27 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * }
      * </pre>
      *
-     * @param exception the exception to be checked
+     * The matcher matches if the actual exception class is either the same as, or is a child
+     * of, the Throwable represented by the specified parameter.
+     * <p>
+     * For example, if the examined code throws a {@code NullPointerException}, all of the
+     * following assertions are valid:
+     *
+     * <pre>
+     * {@code
+     * assertThat( ... throwsException(NullPointerException.class));
+     * assertThat( ... throwsException(RuntimeException.class));
+     * assertThat( ... throwsException(Exception.class));
+     * }
+     * </pre>
+     *
+     * <p>
+     * In other words, the matcher tests whether the actual exception can be converted to the
+     * specified class.
+     * </p>
+     *
+     * @param exception the expected exception class. A null value is allowed, and means that
+     *                  no exception is expected
      * @return the matcher
      */
     @Factory
@@ -97,7 +117,27 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * }
      * </pre>
      *
-     * @param cause the cause to be checked
+     * The matcher matches if the actual cause class is either the same as, or is a child of,
+     * the Throwable represented by the specified parameter.
+     * <p>
+     * For example, if the examined cause is a {@code NullPointerException}, all of the
+     * following assertions are valid:
+     *
+     * <pre>
+     * {@code
+     * withCause(NullPointerException.class);
+     * withCause(RuntimeException.class);
+     * withCause(Exception.class);
+     * }
+     * </pre>
+     *
+     * <p>
+     * In other words, the matcher tests whether the actual cause can be converted to the
+     * specified class.
+     * </p>
+     *
+     * @param cause the expected cause. A null value is allowed, and means that an exception
+     *              without cause is expected
      * @return the matcher, incremented with a given cause for testing
      */
     public ExceptionMatcher withCause(Class<? extends Throwable> cause)
@@ -188,7 +228,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      */
     private boolean validateException(Exception exception, Description mismatch)
     {
-        if (!exception.getClass().equals(expectedException))
+        if (expectedException == null || !expectedException.isAssignableFrom(exception.getClass()))
         {
             mismatch.appendText(NEW_LINE_INDENT).appendText("was ")
                     .appendText(nullSafeClassNameToText(exception.getClass()));
@@ -238,7 +278,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
             mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was null");
             return false;
         }
-        if (cause != null && !cause.getClass().equals(expectedCause))
+        if (cause != null && (expectedCause == null || !expectedCause.isAssignableFrom(cause.getClass())))
         {
             mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was: ")
                     .appendText(nullSafeClassNameToText(cause.getClass()));
