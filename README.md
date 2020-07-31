@@ -71,6 +71,6 @@ If you are using Maven, add **junit-utils** as a dependency to your pom.xml file
 <dependency>
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
