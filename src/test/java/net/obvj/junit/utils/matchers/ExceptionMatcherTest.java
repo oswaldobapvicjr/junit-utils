@@ -46,18 +46,6 @@ public class ExceptionMatcherTest
     // ================================
 
     @Test
-    public void throwsException_nullWithRunnableNotThrowingException_succeeeds()
-    {
-        assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsException(null));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void throwsException_nullWithRunnableThrowingException_fails()
-    {
-        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(null));
-    }
-
-    @Test
     public void throwsException_correctExceptionWithNoCause_succeeds()
     {
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(NullPointerException.class));

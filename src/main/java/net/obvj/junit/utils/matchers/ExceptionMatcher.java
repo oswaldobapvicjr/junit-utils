@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
+import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 /**
@@ -42,9 +43,76 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
  */
 public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
 {
+    private enum ExceptionMatchingStrategy
+    {
+        SIMPLE
+        {
+            @Override
+            public boolean evaluate(ExceptionMatcher matcher, Exception exception, Description mismatch)
+            {
+                if (!matcher.expectedException.isAssignableFrom(exception.getClass()))
+                {
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("was ")
+                            .appendText(nullSafeClassNameToText(exception.getClass()));
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            void describeTo(ExceptionMatcher matcher, Description description)
+            {
+                description.appendText(NEW_LINE_INDENT).appendText(nullSafeClassNameToText(matcher.expectedException));
+            }
+        },
+
+        CLASS_MATCHER
+        {
+            @Override
+            public boolean evaluate(ExceptionMatcher matcher, Exception exception, Description mismatch)
+            {
+                if (!matcher.exceptionClassMatcher.matches(exception))
+                {
+                    // TODO use inner matcher text
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("was ")
+                            .appendText(nullSafeClassNameToText(exception.getClass()));
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            void describeTo(ExceptionMatcher matcher, Description description)
+            {
+                // TODO use inner matcher text
+                description.appendText(NEW_LINE_INDENT).appendText(nullSafeClassNameToText(matcher.expectedException));
+            }
+        };
+
+        /**
+         * Validates the exception class.
+         *
+         * @param matcher   the {@link ExceptionMatcher} instance
+         * @param exception the exception to be validated
+         * @param mismatch  the description to be used for reporting in case of mismatch
+         * @return a flag indicating whether or not the matching has succeeded
+         */
+        abstract boolean evaluate(ExceptionMatcher matcher, Exception exception, Description mismatch);
+
+        /**
+         * Describes the "expected" pat of the test description.
+         *
+         * @see org.hamcrest.SelfDescribing#describeTo(Description)
+         */
+        abstract void describeTo(ExceptionMatcher matcher, Description description);
+    }
+
+
     private static final String NEW_LINE_INDENT = "\n          ";
 
-    private final Class<? extends Exception> expectedException;
+    private final ExceptionMatchingStrategy exceptionMatchingStrategy;
+    private Class<? extends Exception> expectedException;
+    private Matcher<Class<? extends Exception>> exceptionClassMatcher;
 
     private boolean checkCauseFlag = false;
     private boolean checkMessageFlag = false;
@@ -54,13 +122,28 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
 
 
     /**
-     * Builds this Matcher.
+     * Builds this ExceptionMatcher with an expected exception class to be evaluated, so that
+     * it matches if the actual exception class thrown by the tested procedure is either the
+     * same as, or is a child of, the Exception represented by the specified parameter.
      *
      * @param expectedException the expected Exception to be matched
      */
     private ExceptionMatcher(Class<? extends Exception> expectedException)
     {
         this.expectedException = expectedException;
+        this.exceptionMatchingStrategy = ExceptionMatchingStrategy.SIMPLE;
+    }
+
+    /**
+     * Builds this ExceptionMatcher with a class matcher, to be matched against the actual
+     * exception class thrown by the tested procedure.
+     *
+     * @param classMatcher the expected Exception to be matched
+     */
+    private ExceptionMatcher(Matcher<Class<? extends Exception>> classMatcher)
+    {
+        this.exceptionClassMatcher = classMatcher;
+        this.exceptionMatchingStrategy = ExceptionMatchingStrategy.CLASS_MATCHER;
     }
 
     /**
@@ -102,6 +185,29 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     public static ExceptionMatcher throwsException(Class<? extends Exception> exception)
     {
         return new ExceptionMatcher(exception);
+    }
+
+    /**
+     * Creates a matcher that matches if the examined procedure throws an exception which
+     * class matches the specified class matcher.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff("p1"),
+     *         throwsException(isA(IllegalStateException.class)));
+     * }
+     * </pre>
+     *
+     * @param exception the expected exception class. A null value is allowed, and means that
+     *                  no exception is expected
+     * @return the matcher
+     */
+    @Factory
+    public static ExceptionMatcher throwsException(Matcher<Class<? extends Exception>> classMatcher)
+    {
+        return new ExceptionMatcher(classMatcher);
     }
 
     /**
@@ -191,7 +297,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         {
             runnable.run();
             mismatch.appendText(NEW_LINE_INDENT).appendText("no exception was thrown");
-            return expectedException == null;
+            return false;
         }
         catch (Exception exception)
         {
@@ -228,13 +334,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      */
     private boolean validateException(Exception exception, Description mismatch)
     {
-        if (expectedException == null || !expectedException.isAssignableFrom(exception.getClass()))
-        {
-            mismatch.appendText(NEW_LINE_INDENT).appendText("was ")
-                    .appendText(nullSafeClassNameToText(exception.getClass()));
-            return false;
-        }
-        return true;
+        return exceptionMatchingStrategy.evaluate(this, exception, mismatch);
     }
 
     /**
@@ -295,7 +395,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     @Override
     public void describeTo(Description description)
     {
-        description.appendText(NEW_LINE_INDENT).appendText(nullSafeClassNameToText(expectedException));
+        exceptionMatchingStrategy.describeTo(this, description);
         if (checkMessageFlag)
         {
             description.appendText(NEW_LINE_INDENT).appendText("and message containing: ")
@@ -315,7 +415,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * @param clazz the class to be parsed
      * @return the a string containing either the class canonical name or {@code "null"}
      */
-    private String nullSafeClassNameToText(Class<?> clazz)
+    private static String nullSafeClassNameToText(Class<?> clazz)
     {
         return clazz != null ? clazz.getCanonicalName() : "null";
     }
