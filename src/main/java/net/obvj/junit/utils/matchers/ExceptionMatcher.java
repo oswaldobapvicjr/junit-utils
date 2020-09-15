@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.hamcrest.Description;
-import org.hamcrest.Factory;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
+import org.hamcrest.*;
 
 /**
  * A Matcher that matches if a procedure throws an expected exception.
@@ -42,16 +40,95 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
  */
 public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
 {
+    private enum MessageMatchingStrategy
+    {
+        EXPECTED_SUBSTRINGS
+        {
+            @Override
+            boolean validateMessage(ExceptionMatcher matcher, Exception exception, Description mismatch)
+            {
+                String message = exception.getMessage();
+                if (message == null && !matcher.expectedMessageSubstrings.isEmpty())
+                {
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("the message was null");
+                    return false;
+                }
+                for (String substring : matcher.expectedMessageSubstrings)
+                {
+                    if (message != null && !message.contains(substring))
+                    {
+                        mismatch.appendText(NEW_LINE_INDENT).appendText("the message was ").appendValue(message);
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            void describeTo(ExceptionMatcher matcher, Description description)
+            {
+                description.appendText(NEW_LINE_INDENT).appendText("and message containing: ")
+                        .appendText(matcher.expectedMessageSubstrings.toString());
+            }
+        },
+
+        EXTERNAL_MATCHER
+        {
+            @Override
+            boolean validateMessage(ExceptionMatcher matcher, Exception exception, Description mismatch)
+            {
+                String message = exception.getMessage();
+                if (message == null && matcher.messageMatcher != null)
+                {
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("the message was null");
+                    return false;
+                }
+                boolean matcherResult = matcher.messageMatcher.matches(message);
+                if (!matcherResult)
+                {
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("the message ");
+                    matcher.messageMatcher.describeMismatch(message, mismatch);
+                }
+                return matcherResult;
+            }
+
+            @Override
+            void describeTo(ExceptionMatcher matcher, Description description)
+            {
+                description.appendText(NEW_LINE_INDENT).appendText("and message: ");
+                matcher.messageMatcher.describeTo(description);
+            }
+        };
+
+        /**
+         * Validates the exception message.
+         *
+         * @param matcher   the {@link ExceptionMatcher} instance to be handled
+         * @param exception the exception which message is to be validated
+         * @param mismatch  the description to be used for reporting in case of mismatch
+         * @return a flag indicating whether or not the matching has succeeded
+         */
+        abstract boolean validateMessage(ExceptionMatcher matcher, Exception exception, Description mismatch);
+
+        /**
+         * Describes the "expected" pat of the test description.
+         *
+         * @see org.hamcrest.SelfDescribing#describeTo(Description)
+         */
+        abstract void describeTo(ExceptionMatcher matcher, Description description);
+    }
+
     private static final String NEW_LINE_INDENT = "\n          ";
 
     private final Class<? extends Exception> expectedException;
+    private Class<? extends Throwable> expectedCause;
 
     private boolean checkCauseFlag = false;
     private boolean checkMessageFlag = false;
 
-    private Class<? extends Throwable> expectedCause;
+    private MessageMatchingStrategy messageMatchingStrategy;
     private List<String> expectedMessageSubstrings = Collections.emptyList();
-
+    private Matcher<String> messageMatcher;
 
     /**
      * Builds this Matcher.
@@ -148,7 +225,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     }
 
     /**
-     * Assigns one or more expected substrings for the exception message evaluation.
+     * Assigns one or more expected substrings for the exception message validation.
      * <p>
      * For example:
      *
@@ -164,8 +241,8 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * }
      * </pre>
      *
-     * @param substrings a substring of the exception message to be checked
-     * @return the matcher, incremented with a given message for testing
+     * @param substrings one or more substrings for exception message validation
+     * @return the matcher, incremented with the given substring(s) for testing
      */
     public ExceptionMatcher withMessageContaining(String... substrings)
     {
@@ -174,6 +251,49 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
             expectedMessageSubstrings = Arrays.asList(substrings);
         }
         checkMessageFlag = true;
+        messageMatchingStrategy = MessageMatchingStrategy.EXPECTED_SUBSTRINGS;
+        return this;
+    }
+
+    /**
+     * Assigns an external Matcher to be used in combination for exception message validation.
+     * <p>
+     * For example:
+     * <ul>
+     * <li>Combining the ExceptionMatcher and Hamcrest's {@link CoreMatchers}:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff(null),
+     *         throwsException(IllegalArgumentException.class)
+     *             .withMessage(equalTo("argument cannot be null")));
+     * }
+     * </pre>
+     *
+     * </li>
+     *
+     * <li>Combining the ExceptionMatcher with {@link CoreMatchers} and {@link StringMatcher}:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff(null),
+     *         throwsException(MyException.class)
+     *             .withMessage(either(startsWith("ERR-0001"))
+     *                 .or(containsAny("division by zero").ignoreCase())));
+     * }
+     * </pre>
+     *
+     * </li>
+     * </ul>
+     *
+     * @param matcher the matcher to be used in combination for exception message validation
+     * @return the matcher, incremented with the specified matcher for testing
+     */
+    public ExceptionMatcher withMessage(Matcher<String> matcher)
+    {
+        messageMatcher = matcher;
+        checkMessageFlag = true;
+        messageMatchingStrategy = MessageMatchingStrategy.EXTERNAL_MATCHER;
         return this;
     }
 
@@ -212,7 +332,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         {
             return false;
         }
-        if (checkMessageFlag && !expectedMessageSubstrings.isEmpty() && !validateMessage(exception, mismatch))
+        if (checkMessageFlag && !validateMessage(exception, mismatch))
         {
             return false;
         }
@@ -246,21 +366,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      */
     private boolean validateMessage(Exception exception, Description mismatch)
     {
-        String message = exception.getMessage();
-        if (message == null)
-        {
-            mismatch.appendText(NEW_LINE_INDENT).appendText("the message was null");
-            return false;
-        }
-        for (String substring : expectedMessageSubstrings)
-        {
-            if (!message.contains(substring))
-            {
-                mismatch.appendText(NEW_LINE_INDENT).appendText("the message was ").appendValue(message);
-                return false;
-            }
-        }
-        return true;
+        return messageMatchingStrategy.validateMessage(this, exception, mismatch);
     }
 
     /**
@@ -298,8 +404,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         description.appendText(NEW_LINE_INDENT).appendText(nullSafeClassNameToText(expectedException));
         if (checkMessageFlag)
         {
-            description.appendText(NEW_LINE_INDENT).appendText("and message containing: ")
-                    .appendText(expectedMessageSubstrings.toString());
+            messageMatchingStrategy.describeTo(this, description);
         }
         if (checkCauseFlag)
         {
@@ -315,7 +420,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * @param clazz the class to be parsed
      * @return the a string containing either the class canonical name or {@code "null"}
      */
-    private String nullSafeClassNameToText(Class<?> clazz)
+    private static String nullSafeClassNameToText(Class<?> clazz)
     {
         return clazz != null ? clazz.getCanonicalName() : "null";
     }

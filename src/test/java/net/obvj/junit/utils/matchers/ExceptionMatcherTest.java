@@ -1,6 +1,10 @@
 package net.obvj.junit.utils.matchers;
 
 import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsException;
+import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
+import static org.hamcrest.CoreMatchers.either;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
@@ -131,6 +135,36 @@ public class ExceptionMatcherTest
     }
 
     @Test
+    public void withMessage_equalToAndStringMatching_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessage(equalTo(MESSAGE_ERR_0001_FULL)));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withMessage_equalToAndStringNotMatching_fails()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessage(equalTo(MESSAGE1)));
+    }
+
+    @Test
+    public void withMessage_combinedMatcherAndStringMatching_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class)
+                        .withMessage(either(startsWith(ERR_0001)).or(containsAny(MESSAGE1).ignoreCase())));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withMessage_combinedMatcherAndStringNotMatching_fails()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class)
+                        .withMessage(either(startsWith(MESSAGE1)).or(containsAny(MESSAGE2).ignoreCase())));
+    }
+
+    @Test
     public void withMessageContaining_oneSubstringMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
@@ -180,7 +214,7 @@ public class ExceptionMatcherTest
     }
 
     @Test(expected = AssertionError.class)
-    public void withMessage_nullButHasMessage_fails()
+    public void withMessageContaining_nullButHasMessage_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalArgumentException.class).withMessageContaining((String[]) null));

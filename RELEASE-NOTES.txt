@@ -1,6 +1,25 @@
 =============================================================================
 
                                  junit-utils
+                                version 1.2.0
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+New features/enhancements:
+
+  > issue/0013: Accept different class matchers in combination with the
+                ExceptionMatcher
+
+
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
                                 version 1.1.1
 
                                 RELEASE NOTES
