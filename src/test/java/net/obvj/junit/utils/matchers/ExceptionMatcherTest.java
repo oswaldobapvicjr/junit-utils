@@ -164,7 +164,7 @@ public class ExceptionMatcherTest
                         .withMessage(either(startsWith(MESSAGE1)).or(containsAny(MESSAGE2).ignoreCase())));
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void withMessage_startsWithButNoMessage_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
