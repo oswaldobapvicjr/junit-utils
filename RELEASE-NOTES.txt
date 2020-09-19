@@ -9,8 +9,7 @@
 
 New features/enhancements:
 
-  > issue/0013: Accept different class matchers in combination with the
-                ExceptionMatcher
+  > issue/0013: Combining different matchers with the ExceptionMatcher
 
 
 For more information, or suggestions for improvement, visit:

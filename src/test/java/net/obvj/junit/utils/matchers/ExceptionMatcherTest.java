@@ -165,6 +165,27 @@ public class ExceptionMatcherTest
     }
 
     @Test
+    public void withMessage_startsWithButNoMessage_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
+                throwsException(IllegalArgumentException.class).withMessage(startsWith(ERR_0001)));
+    }
+
+    @Test
+    public void withMessage_nullAndHasNotMessage_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
+                throwsException(IllegalArgumentException.class).withMessage(null));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withMessage_nullButHasMessage_fails()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessage(null));
+    }
+
+    @Test
     public void withMessageContaining_oneSubstringMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
