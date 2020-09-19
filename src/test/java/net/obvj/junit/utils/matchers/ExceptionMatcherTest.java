@@ -9,6 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 /**
@@ -165,7 +166,7 @@ public class ExceptionMatcherTest
     }
 
     @Test(expected = AssertionError.class)
-    public void withMessage_startsWithButNoMessage_suceeds()
+    public void withMessage_startsWithButNoMessage_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withMessage(startsWith(ERR_0001)));
@@ -175,14 +176,28 @@ public class ExceptionMatcherTest
     public void withMessage_nullAndHasNotMessage_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
-                throwsException(IllegalArgumentException.class).withMessage(null));
+                throwsException(IllegalArgumentException.class).withMessage((Matcher<String>) null));
     }
 
     @Test(expected = AssertionError.class)
     public void withMessage_nullButHasMessage_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class).withMessage(null));
+                throwsException(IllegalStateException.class).withMessage((Matcher<String>) null));
+    }
+
+    @Test
+    public void withMessage_stringAndMatching_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessage(MESSAGE_ERR_0001_FULL));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withMessage_stringAndNotMatching_fails()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessage(MESSAGE1));
     }
 
     @Test

@@ -257,38 +257,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     }
 
     /**
-     * Assigns one or more expected substrings for the exception message validation.
-     * <p>
-     * For example:
-     *
-     * <pre>
-     * {@code
-     * assertThat(() -> obj.doStuff(null),
-     *         throwsException(IllegalArgumentException.class)
-     *             .withMessageContaining("argument cannot be null");
-     *
-     * assertThat(() -> obj.doStuff(null),
-     *         throwsException(MyException.class)
-     *             .withMessageContaining("ERR-12008", "mandatory");
-     * }
-     * </pre>
-     *
-     * @param substrings one or more substrings for exception message validation
-     * @return the matcher, incremented with the given substring(s) for testing
-     * @since 1.1.0
-     */
-    public ExceptionMatcher withMessageContaining(String... substrings)
-    {
-        if (substrings != null)
-        {
-            expectedMessageSubstrings = Arrays.asList(substrings);
-        }
-        checkMessageFlag = true;
-        messageMatchingStrategy = MessageMatchingStrategy.EXPECTED_SUBSTRINGS;
-        return this;
-    }
-
-    /**
      * Assigns an external Matcher to be used in combination for exception message validation.
      * <p>
      * For example:
@@ -328,6 +296,68 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         messageMatcher = matcher;
         checkMessageFlag = true;
         messageMatchingStrategy = MessageMatchingStrategy.EXTERNAL_MATCHER;
+        return this;
+    }
+
+    /**
+     * Assigns an expected message for validation.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff(null),
+     *         throwsException(IllegalArgumentException.class)
+     *             .withMessage("argument cannot be null"));
+     * }
+     * </pre>
+     *
+     * <b>Note:</b> This has the same effect as calling:
+     *
+     * <pre>
+     * {@code
+     * withMessage(equalTo("argument cannot be null"));
+     * }
+     * </pre>
+     *
+     * @param message the message for exception validation
+     * @return the matcher, incremented with the specified message for testing
+     * @since 1.2.0
+     */
+    public ExceptionMatcher withMessage(String message)
+    {
+        return withMessage(CoreMatchers.equalTo(message));
+    }
+
+    /**
+     * Assigns one or more expected substrings for exception message validation.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff(null),
+     *         throwsException(IllegalArgumentException.class)
+     *             .withMessageContaining("argument cannot be null"));
+     *
+     * assertThat(() -> obj.doStuff(null),
+     *         throwsException(MyException.class)
+     *             .withMessageContaining("ERR-12008", "mandatory"));
+     * }
+     * </pre>
+     *
+     * @param substrings one or more substrings for exception message validation
+     * @return the matcher, incremented with the specified substring(s) for testing
+     * @since 1.1.0
+     */
+    public ExceptionMatcher withMessageContaining(String... substrings)
+    {
+        if (substrings != null)
+        {
+            expectedMessageSubstrings = Arrays.asList(substrings);
+        }
+        checkMessageFlag = true;
+        messageMatchingStrategy = MessageMatchingStrategy.EXPECTED_SUBSTRINGS;
         return this;
     }
 
