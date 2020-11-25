@@ -11,6 +11,8 @@ New features/enhancements:
 
   > issue/0013: Combining different matchers with the ExceptionMatcher
 
+  > issue/0015: Upgrade junit dependency from 4.13 to 4.13.1
+
 
 For more information, or suggestions for improvement, visit:
 https://obvj.net/junit-utils

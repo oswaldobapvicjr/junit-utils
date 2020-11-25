@@ -27,12 +27,23 @@ assertThat(() -> myObject.doStuff(null),
         throwsException(NullPointerException.class));
 ```
 
-To test the exception **message**, add `withMessageContaining`:
+To test the exception **message**, add `withMessageContaining` ...
 
 ```java
 assertThat(() -> myObject.doStuff(null),
-        throwsException(NullPointerException.class).withMessageContaining("ERR-120008"));
+        throwsException(NullPointerException.class)
+            .withMessageContaining("ERR-120008"));
 ```
+
+... or combine a String matcher:
+
+````java
+assertThat(() -> agent.loadSchemaFile("bad-schema.xsd"),
+        throwsException(AgentConfigurationException.class)
+            .withMessage(
+                either(startsWith("ERR-0001"))
+                    .or(containsAny("invalid schema").ignoreCase())));
+````
 
 If required, you can also test the exception **cause**:
 
