@@ -82,6 +82,8 @@ If you are using Maven, add **junit-utils** as a dependency to your pom.xml file
 <dependency>
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
 </dependency>
 ```
+
+If you use other dependency management systems (such as Gradle, Grape, Ivy, etc.) click [here](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils).
