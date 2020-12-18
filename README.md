@@ -1,4 +1,5 @@
-# junit-utils
+![junit-utils logo](resources/junit-utils_logo.svg)
+
 [![Build Status](https://travis-ci.org/oswaldobapvicjr/junit-utils.svg?branch=master)](https://travis-ci.org/oswaldobapvicjr/junit-utils)
 [![Coverage Status](https://coveralls.io/repos/github/oswaldobapvicjr/junit-utils/badge.svg?branch=master)](https://coveralls.io/github/oswaldobapvicjr/junit-utils?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils)
