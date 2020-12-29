@@ -2,11 +2,9 @@ package net.obvj.junit.utils.matchers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.Objects;
 
-import org.hamcrest.Description;
-import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
+import org.hamcrest.*;
 
 /**
  * A Matcher that checks that instantiation is not allowed for a given class, which is
@@ -32,6 +30,8 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
  */
 public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Class<?>>
 {
+    private ExceptionMatcher exceptionMatcher;
+
     /**
      * Creates a matcher that matches if the examined class cannot be instantiated, which is
      * particularly useful for utility classes.
@@ -39,15 +39,131 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * For example:
      *
      * <pre>
-     * assertThat(TestUtils.class, instantiationNotAllowed())
+     * assertThat(TestUtils.class, instantiationNotAllowed());
      * </pre>
      *
      * @return the matcher
      */
     @Factory
-    public static Matcher<Class<?>> instantiationNotAllowed()
+    public static InstantiationNotAllowedMatcher instantiationNotAllowed()
     {
         return new InstantiationNotAllowedMatcher();
+    }
+
+    /**
+     * Assigns an expected Exception <b>(optional step)</b>.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(TestUtils.class, instantiationNotAllowed()
+     *         .throwing(IllegalStateException.class));
+     * }
+     * </pre>
+     *
+     * The matcher matches if the actual exception class is either the same as, or is a child
+     * of, the Exception represented by the specified parameter.
+     * <p>
+     * For example, if the constructor throws a {@code NullPointerException}, all of the
+     * following assertions are valid:
+     *
+     * <pre>
+     * {@code
+     * throwing(IllegalStateException.class);
+     * throwing(RuntimeException.class);
+     * throwing(Exception.class);
+     * }
+     * </pre>
+     *
+     * <p>
+     * In other words, the matcher tests whether the actual exception can be converted to the
+     * specified class.
+     * </p>
+     *
+     * @param exception the expected exception class; must not be null
+     * @return the matcher, incremented with an expected exception
+     * @throws NullPointerException if the specified class is null
+     *
+     * @since 1.2.1
+     */
+    public InstantiationNotAllowedMatcher throwing(Class<? extends Exception> exception)
+    {
+        Objects.requireNonNull(exception, "the expected exception must not be null");
+        exceptionMatcher = ExceptionMatcher.throwsException(exception);
+        return this;
+    }
+
+    /**
+     * Assigns an expected message for Exception validation <b>(optional)</b>.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(TestUtils.class, instantiationNotAllowed()
+     *         .throwing(IllegalStateException.class)
+     *             .withMessage("instantiation not allowed"));
+     * }
+     * </pre>
+     *
+     * The following example is also valid for a test where <b>any</b> Exception is
+     * acceptable, provided that the message matches:
+     *
+     * <pre>
+     * {@code
+     * assertThat(TestUtils.class, instantiationNotAllowed()
+     *         .withMessage("instantiation not allowed"));
+     * }
+     * </pre>
+     *
+     * @param message the message for exception validation
+     * @return the matcher, incremented with the specified message for testing
+     *
+     * @since 1.2.1
+     */
+    public InstantiationNotAllowedMatcher withMessage(String message)
+    {
+        return withMessage(CoreMatchers.equalTo(message));
+    }
+
+    /**
+     * Assigns an external Matcher to be used in combination for the exception message
+     * validation <b>(optional)</b>.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(TestUtils.class, instantiationNotAllowed()
+     *         .throwing(IllegalStateException.class)
+     *             .withMessage(containsString("not allowed")));
+     * }
+     * </pre>
+     *
+     * The following example is also valid for a test where <b>any</b> Exception is
+     * acceptable, provided that the message matches:
+     *
+     * <pre>
+     * {@code
+     * assertThat(TestUtils.class, instantiationNotAllowed()
+     *         .withMessage(endsWith("not allowed")));
+     * }
+     * </pre>
+     *
+     * @param matcher the matcher to be used in combination for exception message validation
+     * @return the matcher, incremented with the specified matcher for exception testing
+     *
+     * @since 1.2.1
+     */
+    public InstantiationNotAllowedMatcher withMessage(Matcher<String> matcher)
+    {
+        if (exceptionMatcher == null)
+        {
+            exceptionMatcher = ExceptionMatcher.throwsException(Exception.class);
+        }
+        exceptionMatcher.withMessage(matcher);
+        return this;
     }
 
     /**
@@ -96,6 +212,11 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
         catch (ReflectiveOperationException exception)
         {
             // the constructor fails to create a new instance
+
+            if (exceptionMatcher != null)
+            {
+                return exceptionMatcher.validateFully(exception.getCause(), mismatch);
+            }
             return true;
         }
     }
@@ -109,6 +230,11 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
     public void describeTo(Description description)
     {
         description.appendText("a class which cannot be instantiated");
+        if (exceptionMatcher != null)
+        {
+            description.appendText(", throwing");
+            exceptionMatcher.describeTo(description);
+        }
     }
 
 }
