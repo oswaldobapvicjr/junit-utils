@@ -55,9 +55,9 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         EXPECTED_SUBSTRINGS
         {
             @Override
-            boolean validateMessage(ExceptionMatcher parent, Exception exception, Description mismatch)
+            boolean validateMessage(ExceptionMatcher parent, Throwable throwable, Description mismatch)
             {
-                String message = exception.getMessage();
+                String message = throwable.getMessage();
                 if (message == null)
                 {
                     if (parent.expectedMessageSubstrings.isEmpty())
@@ -81,7 +81,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
             @Override
             void describeTo(ExceptionMatcher parent, Description description)
             {
-                description.appendText(NEW_LINE_INDENT).appendText("and message containing: ")
+                description.appendText(NEW_LINE_INDENT).appendText("with message containing: ")
                         .appendText(parent.expectedMessageSubstrings.toString());
             }
         },
@@ -94,9 +94,9 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         EXTERNAL_MATCHER
         {
             @Override
-            boolean validateMessage(ExceptionMatcher parent, Exception exception, Description mismatch)
+            boolean validateMessage(ExceptionMatcher parent, Throwable throwable, Description mismatch)
             {
-                String message = exception.getMessage();
+                String message = throwable.getMessage();
                 if (message == null && parent.messageMatcher == null)
                 {
                     return true;
@@ -118,7 +118,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
             @Override
             void describeTo(ExceptionMatcher parent, Description description)
             {
-                description.appendText(NEW_LINE_INDENT).appendText("and message: ");
+                description.appendText(NEW_LINE_INDENT).appendText("with message: ");
                 if (parent.messageMatcher != null)
                 {
                     parent.messageMatcher.describeTo(description);
@@ -134,11 +134,11 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
          * Validates the exception message.
          *
          * @param parent    the {@link ExceptionMatcher} instance to be handled
-         * @param exception the exception which message is to be validated
+         * @param throwable the Throwable whose message is to be validated
          * @param mismatch  the description to be used for reporting in case of mismatch
          * @return a flag indicating whether or not the matching has succeeded
          */
-        abstract boolean validateMessage(ExceptionMatcher parent, Exception exception, Description mismatch);
+        abstract boolean validateMessage(ExceptionMatcher parent, Throwable throwable, Description mismatch);
 
         /**
          * Describes the "expected" pat of the test description.
@@ -183,7 +183,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * </pre>
      *
      * The matcher matches if the actual exception class is either the same as, or is a child
-     * of, the Throwable represented by the specified parameter.
+     * of, the Exception represented by the specified parameter.
      * <p>
      * For example, if the examined code throws a {@code NullPointerException}, all of the
      * following assertions are valid:
@@ -257,7 +257,8 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     }
 
     /**
-     * Assigns an external Matcher to be used in combination for exception message validation.
+     * Assigns an external Matcher to be used in combination for the exception message
+     * validation.
      * <p>
      * For example:
      * <ul>
@@ -386,36 +387,36 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     /**
      * Validates the exception class, message and cause.
      *
-     * @param exception the exception to be validated
+     * @param throwable the Throwable to be validated
      * @param mismatch  the description to be used for reporting in case of mismatch
      * @return a flag indicating whether or not the matching has succeeded
      */
-    private boolean validateFully(Exception exception, Description mismatch)
+    protected boolean validateFully(Throwable throwable, Description mismatch)
     {
-        if (!validateException(exception, mismatch))
+        if (!validateException(throwable, mismatch))
         {
             return false;
         }
-        if (checkMessageFlag && !validateMessage(exception, mismatch))
+        if (checkMessageFlag && !validateMessage(throwable, mismatch))
         {
             return false;
         }
-        return !(checkCauseFlag && !validateCause(exception, mismatch));
+        return !(checkCauseFlag && !validateCause(throwable, mismatch));
     }
 
     /**
      * Validates the exception class.
      *
-     * @param exception the exception to be validated
+     * @param throwable the Throwable to be validated
      * @param mismatch  the description to be used for reporting in case of mismatch
      * @return a flag indicating whether or not the matching has succeeded
      */
-    private boolean validateException(Exception exception, Description mismatch)
+    private boolean validateException(Throwable throwable, Description mismatch)
     {
-        if (expectedException == null || !expectedException.isAssignableFrom(exception.getClass()))
+        if (expectedException == null || !expectedException.isAssignableFrom(throwable.getClass()))
         {
             mismatch.appendText(NEW_LINE_INDENT).appendText("was ")
-                    .appendText(nullSafeClassNameToText(exception.getClass()));
+                    .appendText(nullSafeClassNameToText(throwable.getClass()));
             return false;
         }
         return true;
@@ -424,25 +425,25 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     /**
      * Validates the exception message.
      *
-     * @param exception the exception which message is to be validated
+     * @param throwable the Throwable whose message is to be validated
      * @param mismatch  the description to be used for reporting in case of mismatch
      * @return a flag indicating whether or not the matching has succeeded
      */
-    private boolean validateMessage(Exception exception, Description mismatch)
+    private boolean validateMessage(Throwable throwable, Description mismatch)
     {
-        return messageMatchingStrategy.validateMessage(this, exception, mismatch);
+        return messageMatchingStrategy.validateMessage(this, throwable, mismatch);
     }
 
     /**
      * Validates the exception cause.
      *
-     * @param exception the exception which cause is to be validated
+     * @param throwable the Throwable whose cause is to be validated
      * @param mismatch  the description to be used for reporting in case of mismatch
      * @return a flag indicating whether or not the matching has succeeded
      */
-    private boolean validateCause(Exception exception, Description mismatch)
+    private boolean validateCause(Throwable throwable, Description mismatch)
     {
-        Throwable cause = exception.getCause();
+        Throwable cause = throwable.getCause();
         if (cause == null && expectedCause != null)
         {
             mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was null");
