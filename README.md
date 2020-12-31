@@ -15,7 +15,7 @@ Common utilities for working with JUnit:
 
 ## Examples
 
-> :grey_exclamation: <b>Note:</b> Consider a **static import** declaration to `net.obvj.junit.utils.matchers.AdvancedMatchers.*` for readability.
+> <b>Note:</b> Consider a **static import** declaration to `net.obvj.junit.utils.matchers.AdvancedMatchers.*` for readability.
 
 ### Asserting exceptions
 

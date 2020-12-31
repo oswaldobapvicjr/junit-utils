@@ -192,7 +192,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<CharSequence>
      * For example:
      *
      * <pre>
-     * assertThat("the quick brown fox", containsAny("fox", "brown"))
+     * assertThat("the quick brown fox", containsAny("fox", "dragon"))
      * </pre>
      *
      * @param substrings the substrings to be tested

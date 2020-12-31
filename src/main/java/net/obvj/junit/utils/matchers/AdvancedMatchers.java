@@ -80,11 +80,11 @@ public class AdvancedMatchers
      * </pre>
      *
      * <p>
-     * First, the matcher verifies that all declared constructors are private, then it tries
-     * to create a new instance using the default constructor.
+     * First, the matcher verifies all declared constructors, and then it tries to create a
+     * new instance using the default constructor.
      * <p>
      * A matching class shall have all constructors declared as {@code private} and throw an
-     * exception inside the constructor, so the class will never be instantiated.
+     * exception inside the default constructor, so it can never be instantiated.
      * <p>
      * For example:
      *
@@ -147,7 +147,7 @@ public class AdvancedMatchers
      * For example:
      *
      * <pre>
-     * assertThat("the quick brown fox", containsAny("fox", "quick"))
+     * assertThat("the quick brown fox", containsAny("fox", "dragon"))
      * </pre>
      *
      * By default, the matcher is <b>case-sensitive</b>, but this behavior can be modified
@@ -156,7 +156,7 @@ public class AdvancedMatchers
      * For example:
      *
      * <pre>
-     * assertThat("the quick brown fox", containsAny("FOX", "QuIcK").ignoreCase())
+     * assertThat("the quick brown fox", containsAny("FOX", "dragon").ignoreCase())
      * </pre>
      *
      * @param substrings the substrings to be tested
