@@ -5,13 +5,9 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils)
 [![Javadoc](https://javadoc.io/badge2/net.obvj/junit-utils/javadoc.svg)](https://javadoc.io/doc/net.obvj/junit-utils)
 
-Common utilities for working with JUnit.
+Common utilities for working with JUnit:
 
-## Features
-
-**junit-utils** provides convenient objects and methods for agile development of the following unit-testing scenarios:
-
-- asserting **exceptions**, as well as exception details, such as message and cause
+- assertion of **exceptions**, as well as exception details, such as message and cause
 - assertion of strings contents
 - testing that a class **cannot be instantiated**
 
@@ -19,9 +15,11 @@ Common utilities for working with JUnit.
 
 ## Examples
 
+> <b>Note:</b> Consider a **static import** declaration to `net.obvj.junit.utils.matchers.AdvancedMatchers.*` for readability.
+
 ### Asserting exceptions
 
-The following assertion is true if the examined method throws a NullPointerException. The **ExceptionMatcher** class is in use:
+The following assertion is true if the examined method throws a NullPointerException:
 
 ```java
 assertThat(() -> myObject.doStuff(null),
@@ -56,15 +54,17 @@ assertThat(() -> myObject.doStuff(null),
 
 ### Testing that instantiation is not allowed
 
-The following assertion is particularly useful for utility classes. The **InstantiationNotAllowedMatcher** class is in use:
+The following assertion is particularly useful for utility classes:
 
 ```java
 assertThat(TestUtils.class, instantiationNotAllowed());
 ```
 
+ A matching class shall have all constructors declared as private and throw an exception inside the default constructor.
+
 ### Testing the contents of a string
 
-The following examples represent some successful assertions using the **StringMatcher** class:
+The following examples represent some successful assertions using the Advanced String matcher:
 
 ```java
 assertThat("The quick brown fox jumps over the lazy dog", containsAll("fox", "dog"));
@@ -83,7 +83,7 @@ If you are using Maven, add **junit-utils** as a dependency to your pom.xml file
 <dependency>
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 
