@@ -24,7 +24,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<CharSequence>
     /**
      * Defines the matching strategy to be applied.
      */
-    private enum Strategy
+    protected enum Strategy
     {
         /**
          * Matches if all of the specified substrings are found in the tested string.
@@ -192,7 +192,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<CharSequence>
      * For example:
      *
      * <pre>
-     * assertThat("the quick brown fox", containsAny("fox", "bird"))
+     * assertThat("the quick brown fox", containsAny("fox", "brown"))
      * </pre>
      *
      * @param substrings the substrings to be tested
@@ -267,6 +267,22 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<CharSequence>
         {
             description.appendText(" (").appendText(caseStrategy.description).appendText(")");
         }
+    }
+
+    /**
+     * @return the strategy
+     */
+    protected Strategy getStrategy()
+    {
+        return strategy;
+    }
+
+    /**
+     * @return the substrings
+     */
+    protected List<String> getSubstrings()
+    {
+        return substrings;
     }
 
 }

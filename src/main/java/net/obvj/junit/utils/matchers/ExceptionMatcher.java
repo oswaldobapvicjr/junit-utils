@@ -491,4 +491,12 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         return clazz != null ? clazz.getCanonicalName() : "null";
     }
 
+    /**
+     * @return the expectedException
+     */
+    protected Class<? extends Exception> getExpectedException()
+    {
+        return expectedException;
+    }
+
 }
