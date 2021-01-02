@@ -5,7 +5,7 @@
 
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2-SNAPSHOT</version>
     <name>junit-utils</name>
     <description>Common utilities for working with JUnit</description>
     <url>https://obvj.net/junit-utils</url>
@@ -32,7 +32,7 @@
         <url>https://github.com/oswaldobapvicjr/junit-utils</url>
         <connection>scm:git:git://github.com/oswaldobapvicjr/junit-utils.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/oswaldobapvicjr/junit-utils.git</developerConnection>
-        <tag>junit-utils-1.2.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
