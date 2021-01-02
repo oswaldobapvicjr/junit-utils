@@ -1,11 +1,21 @@
 package net.obvj.junit.utils.matchers;
 
 /**
- * A class that groups all Matchers provided by junit-utils, allowing developers
- * developers to have access to all facilities with a single static import declaration:
+ * A class that groups all Matchers provided by junit-utils, so that they can be accessed
+ * with a single static import declaration.
+ * <p>
+ * For example:
  *
  * <pre>
+ * {@code
  * import static net.obvj.junit.utils.matchers.AdvancedMatchers.*;
+ *
+ * ...
+ *
+ * assertThat(() -> obj.doStuff(),
+ *         throwsException(IllegalStateException.class)
+ *             .withMessage(containsAll("invalid state").ignoreCase()));
+ * }
  * </pre>
  *
  * @author oswaldo.bapvic.jr
