@@ -15,7 +15,13 @@ Common utilities for working with JUnit:
 
 ## Examples
 
-> <b>Note:</b> Consider a **static import** declaration to `net.obvj.junit.utils.matchers.AdvancedMatchers.*` for readability.
+> **Note:** Consider the following static import declarations for readability:
+
+```java
+import static net.obvj.junit.utils.matchers.AdvancedMatchers.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+```
 
 ### Asserting exceptions
 

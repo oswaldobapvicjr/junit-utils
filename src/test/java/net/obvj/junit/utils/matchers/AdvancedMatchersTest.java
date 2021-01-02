@@ -31,7 +31,8 @@ public class AdvancedMatchersTest
     @Test
     public void instantiationNotAllowed_createMatcher()
     {
-        assertThat(AdvancedMatchers.class, instantiationNotAllowed());
+        assertThat(AdvancedMatchers.class, instantiationNotAllowed().throwing(UnsupportedOperationException.class)
+                .withMessage(containsAll("instantiation not allowed").ignoreCase()));
     }
 
     @Test

@@ -1,7 +1,30 @@
 =============================================================================
 
                                  junit-utils
+                                version 1.2.1
+                                   2021-01
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+Minor enhancements:
+
+  > issue/0016: Combining the Exception Matcher with the
+                Instantiation-Not-Allowed Matcher
+
+  > issue/0018: New Advanced Matchers class
+
+
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
                                 version 1.2.0
+                                   2020-11
 
                                 RELEASE NOTES
 
@@ -9,7 +32,7 @@
 
 New features/enhancements:
 
-  > issue/0013: Combining different matchers with the ExceptionMatcher
+  > issue/0013: Combining String Matchers with the Exception Matcher
 
   > issue/0015: Upgrade junit dependency from 4.13 to 4.13.1
 
@@ -22,6 +45,7 @@ https://obvj.net/junit-utils
 
                                  junit-utils
                                 version 1.1.1
+                                   2020-08
 
                                 RELEASE NOTES
 
@@ -48,6 +72,7 @@ https://obvj.net/junit-utils
 
                                  junit-utils
                                 version 1.1.0
+                                   2020-06
 
                                 RELEASE NOTES
 
@@ -77,6 +102,7 @@ https://obvj.net/junit-utils
 
                                  junit-utils
                                 version 1.0.0
+                                   2020-04
 
                                 RELEASE NOTES
 

@@ -77,20 +77,4 @@ public class StringMatcherTest
         assertThat(THE_QUICK_BROWN_FOX, containsAll(DRAGON).ignoreCase());
     }
 
-    @Test
-    public void containsAll_stringBufferAllSubstringsFound_suceeds()
-    {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(THE_QUICK_BROWN_FOX);
-        assertThat(stringBuffer, containsAll(DOG, FOX));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void containsAll_stringBufferNotAllSubstringsFound_suceeds()
-    {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(THE_QUICK_BROWN_FOX);
-        assertThat(stringBuffer, containsAll(DRAGON));
-    }
-
 }

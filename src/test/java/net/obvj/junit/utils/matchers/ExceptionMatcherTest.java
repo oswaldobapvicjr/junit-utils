@@ -150,6 +150,13 @@ public class ExceptionMatcherTest
     }
 
     @Test
+    public void withMessage_combinedStringMatcher_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessage(containsAny(MESSAGE1).ignoreCase()));
+    }
+
+    @Test
     public void withMessage_combinedMatcherAndStringMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
