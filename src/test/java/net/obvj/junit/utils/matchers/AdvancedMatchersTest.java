@@ -3,6 +3,7 @@ package net.obvj.junit.utils.matchers;
 import static net.obvj.junit.utils.matchers.AdvancedMatchers.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
@@ -64,6 +65,20 @@ public class AdvancedMatchersTest
         StringMatcher matcher = containsNone(STRING1, STRING2);
         assertThat(matcher.getStrategy(), is(equalTo(Strategy.NONE)));
         assertThat(matcher.getSubstrings(), is(equalTo(Arrays.asList(STRING1, STRING2))));
+    }
+
+    @Test
+    public void isPositive_validNumbers_validatesAccordingly()
+    {
+        assertThat(Integer.MAX_VALUE, isPositive());
+        assertThat(Integer.MIN_VALUE, not(isPositive()));
+    }
+
+    @Test
+    public void isNegative_validNumbers_validatesAccordingly()
+    {
+        assertThat(Integer.MIN_VALUE, isNegative());
+        assertThat(Integer.MAX_VALUE, not(isNegative()));
     }
 
 }
