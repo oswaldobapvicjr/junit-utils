@@ -195,4 +195,38 @@ public class AdvancedMatchers
         return StringMatcher.containsNone(substrings);
     }
 
+    /**
+     * A matcher that matches if a {@link Number} is positive.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * assertThat(1910, isPositive())
+     * </pre>
+     *
+     * @return the matcher
+     * @since 1.3.0
+     */
+    public static IsPositiveMatcher isPositive()
+    {
+        return IsPositiveMatcher.isPositive();
+    }
+
+    /**
+     * A matcher that matches if a {@link Number} is negative.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * assertThat(-1, isNegative())
+     * </pre>
+     *
+     * @return the matcher
+     * @since 1.3.0
+     */
+    public static IsNegativeMatcher isNegative()
+    {
+        return IsNegativeMatcher.isNegative();
+    }
+
 }

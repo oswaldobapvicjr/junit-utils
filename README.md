@@ -78,6 +78,14 @@ assertThat("The quick brown fox jumps over the lazy dog", containsAny("FOX", "dr
 assertThat("The quick brown fox jumps over the lazy dog", containsNone("centaur"));
 ```
 
+### Testing numbers
+
+Sometimes, it's more meaningful to check whether a number is positive or negative than testing the value itself, especially in situations where the exact value is unpredictable:
+
+```java
+assertThat(stopwatch.elapsedTime(),           isPositive());
+assertThat(duration.compareTo(otherDuration), isNegative());
+```
 
 ----
 
@@ -89,7 +97,7 @@ If you are using Maven, add **junit-utils** as a dependency to your pom.xml file
 <dependency>
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.2.1</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
