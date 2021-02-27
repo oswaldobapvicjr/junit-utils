@@ -539,9 +539,11 @@ th.colFirst, th.colLast, th.colOne, .constantsSummary th {
     text-align:left;
     padding:8px 3px 3px 7px;
 }
+
+/* table, first column */
 td.colFirst, th.colFirst {
     white-space:nowrap;
-    font-size:13px;
+    font-size:14px;
 }
 td.colLast, th.colLast {
     font-size:13px;
