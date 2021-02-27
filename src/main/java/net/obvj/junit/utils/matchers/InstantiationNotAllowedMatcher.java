@@ -58,8 +58,7 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * <pre>
      * {@code
      * assertThat(TestUtils.class, instantiationNotAllowed()
-     *         .throwing(IllegalStateException.class));
-     * }
+     *         .throwing(IllegalStateException.class));}
      * </pre>
      *
      * The matcher matches if the actual exception class is either the same as, or is a child
@@ -69,11 +68,9 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * following assertions are valid:
      *
      * <pre>
-     * {@code
      * throwing(IllegalStateException.class);
      * throwing(RuntimeException.class);
      * throwing(Exception.class);
-     * }
      * </pre>
      *
      * <p>
@@ -103,8 +100,7 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * {@code
      * assertThat(TestUtils.class, instantiationNotAllowed()
      *         .throwing(IllegalStateException.class)
-     *             .withMessage("instantiation not allowed"));
-     * }
+     *             .withMessage("instantiation not allowed"));}
      * </pre>
      *
      * The following example is also valid for a test where <b>any</b> Exception is
@@ -113,8 +109,7 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * <pre>
      * {@code
      * assertThat(TestUtils.class, instantiationNotAllowed()
-     *         .withMessage("instantiation not allowed"));
-     * }
+     *         .withMessage("instantiation not allowed"));}
      * </pre>
      *
      * @param message the message for exception validation
@@ -137,8 +132,7 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * {@code
      * assertThat(TestUtils.class, instantiationNotAllowed()
      *         .throwing(IllegalStateException.class)
-     *             .withMessage(containsString("not allowed")));
-     * }
+     *             .withMessage(containsString("not allowed")));}
      * </pre>
      *
      * The following example is also valid for a test where <b>any</b> Exception is
@@ -147,8 +141,7 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      * <pre>
      * {@code
      * assertThat(TestUtils.class, instantiationNotAllowed()
-     *         .withMessage(endsWith("not allowed")));
-     * }
+     *         .withMessage(endsWith("not allowed")));}
      * </pre>
      *
      * @param matcher the matcher to be used in combination for exception message validation
@@ -224,7 +217,7 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
     /**
      * Describes the "expected" pat of the test description.
      *
-     * @see org.hamcrest.SelfDescribing#describeTo(Description)
+     * @param description the {@link Description} to be appended to
      */
     @Override
     public void describeTo(Description description)

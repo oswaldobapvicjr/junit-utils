@@ -14,8 +14,7 @@ package net.obvj.junit.utils.matchers;
  *
  * assertThat(() -> obj.doStuff(),
  *         throwsException(IllegalStateException.class)
- *             .withMessage(containsAll("invalid state").ignoreCase()));
- * }
+ *             .withMessage(containsAll("invalid state").ignoreCase()));}
  * </pre>
  *
  * @author oswaldo.bapvic.jr
@@ -36,8 +35,7 @@ public class AdvancedMatchers
      * <pre>
      * {@code
      * assertThat(() -> obj.doStuff("p1"),
-     *         throwsException(IllegalStateException.class));
-     * }
+     *         throwsException(IllegalStateException.class));}
      * </pre>
      *
      * The matcher matches if the actual exception class is either the same as, or is a child
@@ -50,8 +48,7 @@ public class AdvancedMatchers
      * {@code
      * assertThat( ... throwsException(NullPointerException.class));
      * assertThat( ... throwsException(RuntimeException.class));
-     * assertThat( ... throwsException(Exception.class));
-     * }
+     * assertThat( ... throwsException(Exception.class));}
      * </pre>
      *
      * In other words, the matcher tests whether the actual exception can be converted to the
@@ -66,8 +63,7 @@ public class AdvancedMatchers
      * {@code
      * assertThat(() -> obj.doStuff(""),
      *         throwsException(IllegalArgumentException.class)
-     *             .withMessage("The argument must not be empty"));
-     * }
+     *             .withMessage("The argument must not be empty"));}
      * </pre>
      *
      * @param exception the expected exception class. A null value is allowed, and means that
@@ -112,8 +108,7 @@ public class AdvancedMatchers
      * {@code
      * assertThat(TestUtils.class, instantiationNotAllowed()
      *         .throwing(IllegalStateException.class)
-     *             .withMessage("Instantiation not allowed"));
-     * }
+     *             .withMessage("Instantiation not allowed"));}
      * </pre>
      *
      * @return the matcher
@@ -198,10 +193,13 @@ public class AdvancedMatchers
     /**
      * A matcher that matches if a {@link Number} is positive.
      * <p>
+     * This is particularly useful in situations where the exact value of an operation is
+     * unpredictable.
+     * <p>
      * For example:
      *
      * <pre>
-     * assertThat(1910, isPositive())
+     * assertThat(stopwatch.elapsedTime(TimeUnit.MILLISECONDS), isPositive());
      * </pre>
      *
      * @return the matcher
@@ -215,10 +213,13 @@ public class AdvancedMatchers
     /**
      * A matcher that matches if a {@link Number} is negative.
      * <p>
+     * This is particularly useful in situations where the exact value of an operation is
+     * unpredictable.
+     * <p>
      * For example:
      *
      * <pre>
-     * assertThat(-1, isNegative())
+     * assertThat(duration.compareTo(otherDuration), isNegative());
      * </pre>
      *
      * @return the matcher

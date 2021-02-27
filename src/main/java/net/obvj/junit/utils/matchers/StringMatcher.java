@@ -256,7 +256,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     /**
      * Describes the "expected" pat of the test description.
      *
-     * @see org.hamcrest.SelfDescribing#describeTo(Description)
+     * @param description the {@link Description} to be appended to
      */
     @Override
     public void describeTo(Description description)

@@ -14,8 +14,7 @@ import org.hamcrest.*;
  * <pre>
  * {@code
  * assertThat(() -> obj.doStuff("p1"),
- *         throwsException(NullPointerException.class));
- * }
+ *         throwsException(NullPointerException.class));}
  * </pre>
  *
  * <p>
@@ -31,8 +30,7 @@ import org.hamcrest.*;
  *
  * assertThat(() -> obj.doStuff(null),
  *         throwsException(MyException.class)
- *             .withMessageContaining("ERR-12008"));
- * }
+ *             .withMessageContaining("ERR-12008"));}
  * </pre>
  *
  * @author oswaldo.bapvic.jr
@@ -142,8 +140,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
 
         /**
          * Describes the "expected" pat of the test description.
-         *
-         * @see org.hamcrest.SelfDescribing#describeTo(Description)
          */
         abstract void describeTo(ExceptionMatcher parent, Description description);
     }
@@ -178,8 +174,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * <pre>
      * {@code
      * assertThat(() -> obj.doStuff("p1"),
-     *         throwsException(IllegalStateException.class));
-     * }
+     *         throwsException(IllegalStateException.class));}
      * </pre>
      *
      * The matcher matches if the actual exception class is either the same as, or is a child
@@ -192,8 +187,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * {@code
      * assertThat( ... throwsException(NullPointerException.class));
      * assertThat( ... throwsException(RuntimeException.class));
-     * assertThat( ... throwsException(Exception.class));
-     * }
+     * assertThat( ... throwsException(Exception.class));}
      * </pre>
      *
      * <p>
@@ -221,8 +215,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * {@code
      * assertThat(() -> obj.doStuff("p1"),
      *         throwsException(IllegalStateException.class)
-     *             .withCause(FileNotFoundException.class));
-     * }
+     *             .withCause(FileNotFoundException.class));}
      * </pre>
      *
      * The matcher matches if the actual cause class is either the same as, or is a child of,
@@ -232,11 +225,9 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * following assertions are valid:
      *
      * <pre>
-     * {@code
      * withCause(NullPointerException.class);
      * withCause(RuntimeException.class);
      * withCause(Exception.class);
-     * }
      * </pre>
      *
      * <p>
@@ -268,8 +259,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * {@code
      * assertThat(() -> obj.doStuff(null),
      *         throwsException(IllegalArgumentException.class)
-     *             .withMessage(equalTo("argument cannot be null")));
-     * }
+     *             .withMessage(equalTo("argument cannot be null")));}
      * </pre>
      *
      * </li>
@@ -281,8 +271,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * assertThat(() -> obj.doStuff(null),
      *         throwsException(MyException.class)
      *             .withMessage(either(startsWith("ERR-0001"))
-     *                 .or(containsAny("division by zero").ignoreCase())));
-     * }
+     *                 .or(containsAny("division by zero").ignoreCase())));}
      * </pre>
      *
      * </li>
@@ -309,16 +298,13 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * {@code
      * assertThat(() -> obj.doStuff(null),
      *         throwsException(IllegalArgumentException.class)
-     *             .withMessage("argument cannot be null"));
-     * }
+     *             .withMessage("argument cannot be null"));}
      * </pre>
      *
      * <b>Note:</b> This has the same effect as calling:
      *
      * <pre>
-     * {@code
      * withMessage(equalTo("argument cannot be null"));
-     * }
      * </pre>
      *
      * @param message the message for exception validation
@@ -343,8 +329,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      *
      * assertThat(() -> obj.doStuff(null),
      *         throwsException(MyException.class)
-     *             .withMessageContaining("ERR-12008", "mandatory"));
-     * }
+     *             .withMessageContaining("ERR-12008", "mandatory"));}
      * </pre>
      *
      * @param substrings one or more substrings for exception message validation
@@ -461,7 +446,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     /**
      * Describes the "expected" pat of the test description.
      *
-     * @see org.hamcrest.SelfDescribing#describeTo(Description)
+     * @param description the {@link Description} to be appended to
      */
     @Override
     public void describeTo(Description description)

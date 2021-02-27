@@ -7,10 +7,13 @@ import org.hamcrest.TypeSafeMatcher;
 /**
  * A matcher that matches if a {@link Number} is negative.
  * <p>
+ * This is particularly useful in situations where the exact value of an operation is
+ * unpredictable.
+ * <p>
  * For example:
  *
  * <pre>
- * assertThat(-1, isNegative())
+ * assertThat(duration.compareTo(otherDuration), isNegative());
  * </pre>
  *
  * @author oswaldo.bapvic.jr
