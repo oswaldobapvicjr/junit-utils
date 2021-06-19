@@ -11,11 +11,11 @@ on:
 
 jobs:
   build:
-
+    name: Build and test on JDK ${{ matrix.java_version }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java_version: [8, 11]
+        java_version: [ 8, 11, 16, 17-ea ]
 
     steps:
     - uses: actions/checkout@v2
