@@ -1,7 +1,7 @@
 ![junit-utils logo](resources/junit-utils_logo.svg)
 
-[![Build Status](https://travis-ci.org/oswaldobapvicjr/junit-utils.svg?branch=master)](https://travis-ci.org/oswaldobapvicjr/junit-utils)
-[![Coverage Status](https://coveralls.io/repos/github/oswaldobapvicjr/junit-utils/badge.svg?branch=master)](https://coveralls.io/github/oswaldobapvicjr/junit-utils?branch=master)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/oswaldobapvicjr/junit-utils/Java%20CI%20with%20Maven)](https://github.com/oswaldobapvicjr/junit-utils/actions/workflows/maven.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/oswaldobapvicjr/junit-utils)](https://codecov.io/gh/oswaldobapvicjr/junit-utils)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils)
 [![Javadoc](https://javadoc.io/badge2/net.obvj/junit-utils/javadoc.svg)](https://javadoc.io/doc/net.obvj/junit-utils)
 
