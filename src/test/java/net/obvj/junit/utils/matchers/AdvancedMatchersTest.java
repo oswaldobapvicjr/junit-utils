@@ -37,6 +37,25 @@ public class AdvancedMatchersTest
     }
 
     @Test
+    public void throwsException_noArgument_createExceptionMatcherAccordingly()
+    {
+        ExceptionMatcher matcher = throwsException();
+        assertThat(matcher.getExpectedException(), is(equalTo(Exception.class)));
+    }
+
+    @Test
+    public void throwsNoException_validProcedure_success()
+    {
+        assertThat(() -> STRING1.contains(STRING1), throwsNoException());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void throwsNoException_procedureThrowsException_failure()
+    {
+        assertThat(() -> ((String) null).contains(STRING1), throwsNoException());
+    }
+
+    @Test
     public void throwsException_validClass_createExceptionMatcherAccordingly()
     {
         ExceptionMatcher matcher = throwsException(FileNotFoundException.class);

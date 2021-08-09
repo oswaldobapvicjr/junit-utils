@@ -1,6 +1,28 @@
 =============================================================================
 
                                  junit-utils
+                                version 1.3.1
+                                   2021-08
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+Minor enhancements:
+
+  > issue/0022: New ExceptionMatcher methods: throwsException() for any
+                exception, and throwsNoException() for no exception
+
+  > General Javadoc improvements
+
+
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
                                 version 1.3.0
                                    2021-02
 
