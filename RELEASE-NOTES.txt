@@ -11,7 +11,7 @@
 Minor enhancements:
 
   > issue/0022: New ExceptionMatcher methods: throwsException() for any
-                exception class, and throwsNoException() for no exception
+                exception, and throwsNoException() for no exception
 
   > General Javadoc improvements
 
