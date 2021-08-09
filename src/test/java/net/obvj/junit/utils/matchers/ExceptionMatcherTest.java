@@ -1,6 +1,7 @@
 package net.obvj.junit.utils.matchers;
 
 import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsException;
+import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsNoException;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -57,9 +58,33 @@ public class ExceptionMatcherTest
     }
 
     @Test(expected = AssertionError.class)
-    public void throwsException_nullWithRunnableThrowingException_fails()
+    public void throwsException_nullWithRunnableThrowingException_failure()
     {
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(null));
+    }
+
+    @Test
+    public void throwsNoException_runnableNotThrowingException_succeeeds()
+    {
+        assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsNoException());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void throwsNoException_runnableThrowingException_failure()
+    {
+        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsNoException());
+    }
+
+    @Test
+    public void throwsException_noArgumentWithRunnableThrowingException_success()
+    {
+        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void throwsException_noArgumentWithRunnableNotThrowingException_failue()
+    {
+        assertThat(() -> MESSAGE2.equals(MESSAGE1), throwsException());
     }
 
     @Test

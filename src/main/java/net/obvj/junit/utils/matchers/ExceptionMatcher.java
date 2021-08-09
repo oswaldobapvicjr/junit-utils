@@ -167,6 +167,34 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     }
 
     /**
+     * Creates a matcher that matches if the examined procedure throws any exception.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff("p1"),
+     *         throwsException());}
+     * </pre>
+     *
+     * <strong>Note:</strong> This has the same effect as calling:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff("p1"),
+     *         throwsException(Exception.class));}
+     * </pre>
+     *
+     * @return the matcher
+     * @since 1.3.1
+     */
+    @Factory
+    public static ExceptionMatcher throwsException()
+    {
+        return new ExceptionMatcher(Exception.class);
+    }
+
+    /**
      * Creates a matcher that matches if the examined procedure throws a given exception.
      * <p>
      * For example:
@@ -204,6 +232,34 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     public static ExceptionMatcher throwsException(Class<? extends Exception> exception)
     {
         return new ExceptionMatcher(exception);
+    }
+
+    /**
+     * Creates a matcher that matches if the examined procedure throws no exception.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff("p1"),
+     *         throwsNoException());}
+     * </pre>
+     *
+     * <strong>Note:</strong> This has the same effect as calling:
+     *
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff("p1"),
+     *         throwsException(null));}
+     * </pre>
+     *
+     * @return the matcher
+     * @since 1.3.1
+     */
+    @Factory
+    public static Matcher<Runnable> throwsNoException()
+    {
+        return new ExceptionMatcher(null);
     }
 
     /**
@@ -473,7 +529,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      */
     private static String nullSafeClassNameToText(Class<?> clazz)
     {
-        return clazz != null ? clazz.getCanonicalName() : "null";
+        return clazz != null ? clazz.getCanonicalName() : "no exception";
     }
 
     /**
