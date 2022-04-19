@@ -1,0 +1,9 @@
+coverage:
+  precision: 2
+  round: down
+  range: "70...90"
+  status:
+    project:
+      default:
+        target: auto # will use the coverage from the base commit to compare against
+        threshold: 5% # allow the coverage to drop, still posting a success status
