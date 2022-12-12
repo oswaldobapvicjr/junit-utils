@@ -114,7 +114,7 @@ public class TestUtilsTest
         {
             try
             {
-                TestUtils.assertInstantiationNotAllowed(Runtime.class, UnsupportedOperationException.class);
+                TestUtils.assertInstantiationNotAllowed(ClassWithPrivateConstructor.class);
             }
             catch (ReflectiveOperationException e)
             {
@@ -122,6 +122,14 @@ public class TestUtilsTest
                 e.printStackTrace();
             }
         });
+    }
+
+    static class ClassWithPrivateConstructor
+    {
+        private ClassWithPrivateConstructor()
+        {
+            // Empty on purpose
+        }
     }
 
     @Test
@@ -238,6 +246,30 @@ public class TestUtilsTest
     public void assertStringDoesNotContain_oneStringFound_fails()
     {
         TestUtils.assertStringDoesNotContain(THE_QUICK_BROWN_FOX, "sphinx", "brown");
+    }
+
+    @Test
+    public void assertPositiveNumber_positiveNumber_success()
+    {
+        TestUtils.assertPositiveNumber(999);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void assertPositiveNumber_negativeNumber_success()
+    {
+        TestUtils.assertPositiveNumber(-999);
+    }
+
+    @Test
+    public void assertNegativeNumber_negativeNumber_success()
+    {
+        TestUtils.assertNegativeNumber(-999);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void assertNegativeNumber_positiveNumber_success()
+    {
+        TestUtils.assertNegativeNumber(999);
     }
 
 }
