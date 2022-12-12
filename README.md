@@ -92,13 +92,13 @@ assertThat(duration.compareTo(otherDuration), isNegative());
 
 ## How to include it
 
-If you are using Maven, add **junit-utils** as a dependency to your pom.xml file:
+If you are using Maven, add **junit-utils** as a dependency in your pom.xml file:
 
 ```xml
 <dependency>
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
