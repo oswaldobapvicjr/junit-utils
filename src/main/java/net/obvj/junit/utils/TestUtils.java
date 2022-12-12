@@ -40,6 +40,8 @@ public class TestUtils
     private static final String UNEXPECTED_STRING_FOUND = "Unexpected string \"%s\" found in: \"%s\"";
     private static final String THE_CONSTRUCTOR_IS_NOT_PRIVATE = "The constructor \"%s\" is not private";
     private static final String INSTANTIATION_WAS_ALLOWED_BY_THE_CONSTRUCTOR = "Instantiation via Reflection was allowed by the constructor \"%s\"";
+    private static final String EXPECTED_POSITIVE = "Expected a positive number but was: %s";
+    private static final String EXPECTED_NEGATIVE = "Expected a negative number but was: %s";
 
     private TestUtils()
     {
@@ -358,5 +360,33 @@ public class TestUtils
                 .forEach(expectedString -> assertFalse(
                         String.format(UNEXPECTED_STRING_FOUND, expectedString, testString),
                         testString.contains(expectedString)));
+    }
+
+    /**
+     * Assert that a number is positive.
+     *
+     * @param number the number to be checked
+     * @since 1.4.0
+     */
+    public static void assertPositiveNumber(Number number)
+    {
+        if (number.doubleValue() < 0)
+        {
+            throw new AssertionError(String.format(EXPECTED_POSITIVE, number));
+        }
+    }
+
+    /**
+     * Assert that a number is negative.
+     *
+     * @param number the number to be checked
+     * @since 1.4.0
+     */
+    public static void assertNegativeNumber(Number number)
+    {
+        if (number.doubleValue() > 0)
+        {
+            throw new AssertionError(String.format(EXPECTED_NEGATIVE, number));
+        }
     }
 }
