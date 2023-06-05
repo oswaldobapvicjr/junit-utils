@@ -18,6 +18,8 @@ package net.obvj.junit.utils.matchers;
 
 import org.hamcrest.Matcher;
 
+import net.obvj.junit.utils.Procedure;
+
 /**
  * A class that groups all Matchers provided by junit-utils, so that they can be accessed
  * with a single static import declaration.
@@ -163,7 +165,7 @@ public class AdvancedMatchers
      * @return the matcher
      * @since 1.3.1
      */
-    public static Matcher<Runnable> throwsNoException()
+    public static Matcher<Procedure> throwsNoException()
     {
         return ExceptionMatcher.throwsNoException();
     }

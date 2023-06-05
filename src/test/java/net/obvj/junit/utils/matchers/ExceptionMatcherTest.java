@@ -25,6 +25,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -342,5 +343,15 @@ public class ExceptionMatcherTest
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
                 throwsException(IllegalStateException.class).withCause(FileNotFoundException.class)
                         .withMessageContaining(MESSAGE2));
+    }
+
+    @Test
+    public void throwsException_checkedException_success()
+    {
+        assertThat(() ->
+        {
+            throw new IOException(new FileNotFoundException());
+        },
+        throwsException(IOException.class).withCause(FileNotFoundException.class));
     }
 }

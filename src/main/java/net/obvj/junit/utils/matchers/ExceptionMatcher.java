@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.hamcrest.*;
 
+import net.obvj.junit.utils.Procedure;
+
 /**
  * A Matcher that matches if a procedure throws an expected exception.
  * <p>
@@ -52,7 +54,7 @@ import org.hamcrest.*;
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
  */
-public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
+public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
 {
     /**
      * Defines different strategies for validating the message of an expected exception.
@@ -145,7 +147,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
         };
 
         /**
-         * Validates the exception message.
+         * Validates the throwable's message.
          *
          * @param parent    the {@link ExceptionMatcher} instance to be handled
          * @param throwable the Throwable whose message is to be validated
@@ -273,7 +275,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
      * @since 1.3.1
      */
     @Factory
-    public static Matcher<Runnable> throwsNoException()
+    public static Matcher<Procedure> throwsNoException()
     {
         return new ExceptionMatcher(null);
     }
@@ -422,20 +424,20 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Runnable>
     /**
      * Execute the matcher business logic for the specified procedure.
      *
-     * @param runnable a procedure supposed to produce an exception to be evaluated
+     * @param procedure a procedure supposed to produce an exception to be evaluated
      * @param mismatch the description to be used for reporting in case of mismatch
      * @return a flag indicating whether or not the matching has succeeded
      */
     @Override
-    protected boolean matchesSafely(Runnable runnable, Description mismatch)
+    protected boolean matchesSafely(Procedure procedure, Description mismatch)
     {
         try
         {
-            runnable.run();
+            procedure.execute();
             mismatch.appendText(NEW_LINE_INDENT).appendText("no exception was thrown");
             return expectedException == null;
         }
-        catch (Exception exception)
+        catch (Throwable exception)
         {
             return validateFully(exception, mismatch);
         }
