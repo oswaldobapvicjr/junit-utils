@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -76,6 +77,16 @@ public class AdvancedMatchersTest
     {
         ExceptionMatcher matcher = throwsException(FileNotFoundException.class);
         assertThat(matcher.getExpectedException(), is(equalTo(FileNotFoundException.class)));
+    }
+
+    @Test
+    public void throwsException_procedureThrowingCheckedException_success()
+    {
+        assertThat(() ->
+        {
+            throw new IOException("invalid");
+        },
+        throwsException(IOException.class).withMessage("invalid"));
     }
 
     @Test
