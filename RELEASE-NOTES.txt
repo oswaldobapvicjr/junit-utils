@@ -1,6 +1,25 @@
 =============================================================================
 
                                  junit-utils
+                                version 1.5.0
+                                   2023-06
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+New features/enhancements:
+
+  > issue/0026: Allow testing functions that throw checked exceptions
+
+ 
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
                                 version 1.4.0
                                    2022-12
 
