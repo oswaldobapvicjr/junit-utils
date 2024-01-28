@@ -208,14 +208,14 @@ public class ExceptionMatcherTest
 
 
     @Test
-    public void withCause_nullAndNoCause_succeeds()
+    public void withNoCause_nullAndNoCause_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withNoCause());
     }
 
     @Test(expected = AssertionError.class)
-    public void withCause_nullButHasCause_fails()
+    public void withNoCause_nullButHasCause_fails()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class).withNoCause());
