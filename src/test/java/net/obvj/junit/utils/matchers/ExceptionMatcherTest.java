@@ -16,8 +16,7 @@
 
 package net.obvj.junit.utils.matchers;
 
-import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsException;
-import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsNoException;
+import static net.obvj.junit.utils.matchers.ExceptionMatcher.*;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -29,7 +28,6 @@ import java.io.IOException;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
-
 /**
  * Unit tests for the {@link ExceptionMatcher} class.
  *
@@ -42,6 +40,8 @@ public class ExceptionMatcherTest
     private static final String MESSAGE1 = "message1";
     private static final String MESSAGE2 = "message2";
     private static final String MESSAGE_ERR_0001_FULL = "[ERR-0001] message1";
+    private static final String IAE_MESSAGE = "iae message";
+    private static final String NPE_MESSAGE = "npe message";
     private static final String NULL_STRING = null;
 
     private static final Runnable RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE = () ->
@@ -56,7 +56,7 @@ public class ExceptionMatcherTest
 
     private static final Runnable RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE = () ->
     {
-        throw new IllegalArgumentException(new NullPointerException());
+        throw new IllegalArgumentException(IAE_MESSAGE, new NullPointerException(NPE_MESSAGE));
     };
 
     private static final Runnable RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE = () ->
@@ -164,17 +164,61 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    public void withCause_nullAndNoCause_succeeds()
+    public void withCause_causeMatcherAndCorrectCauseClass_succeeds()
     {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
-                throwsException(IllegalArgumentException.class).withCause(null));
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                throwsException(IllegalArgumentException.class)
+                        .withCause(exception(NullPointerException.class)));
+    }
+
+    @Test
+    public void withCause_causeMatcherAndCauseClassIsChild_succeeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                throwsException(IllegalArgumentException.class)
+                        .withCause(exception(RuntimeException.class)));
     }
 
     @Test(expected = AssertionError.class)
-    public void withCause_nullButHasCause_fails()
+    public void withCause_causeMatcherAndIncorrectCauseClass_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
-                throwsException(IllegalArgumentException.class).withCause(null));
+                throwsException(IllegalArgumentException.class)
+                        .withCause(exception(FileNotFoundException.class)));
+    }
+
+    @Test
+    public void withCause_causeMatcherAndCorrectCauseClassAndMessage_succeeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                throwsException(IllegalArgumentException.class)
+                        .withMessage(IAE_MESSAGE)
+                        .withCause(exception(NullPointerException.class)
+                                .withMessage(NPE_MESSAGE)));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withCause_causeMatcherAndCorrectCauseClassAndIncorrectMessage_succeeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                throwsException(IllegalArgumentException.class)
+                        .withCause(exception(NullPointerException.class)
+                                .withMessage(IAE_MESSAGE)));
+    }
+
+
+    @Test
+    public void withNoCause_nullAndNoCause_succeeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
+                throwsException(IllegalArgumentException.class).withNoCause());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void withNoCause_nullButHasCause_fails()
+    {
+        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                throwsException(IllegalArgumentException.class).withNoCause());
     }
 
     @Test
