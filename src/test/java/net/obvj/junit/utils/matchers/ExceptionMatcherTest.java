@@ -623,36 +623,90 @@ class ExceptionMatcherTest
                         .withCause(NullPointerException.class));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     void withMessageContainingAndCause_matchingMessageButIncorrectCause_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE1)
-                        .withCause(FileNotFoundException.class));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class).withMessageContaining(MESSAGE1)
+                            .withCause(FileNotFoundException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message1]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.io.FileNotFoundException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the cause was: java.lang.NullPointerException"));
+        }
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     void withMessageContainingAndCause_matchingCauseButIncorrectMessage_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2)
-                        .withCause(FileNotFoundException.class));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2)
+                            .withCause(NullPointerException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message2]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.lang.NullPointerException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     void withCauseAndMessageContaining_matchingMessageButIncorrectCause_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withCause(FileNotFoundException.class)
-                        .withMessageContaining(MESSAGE1));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class)
+                            .withCause(FileNotFoundException.class)
+                            .withMessageContaining(MESSAGE1));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message1]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.io.FileNotFoundException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the cause was: java.lang.NullPointerException"));
+        }
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     void withCauseAndMessageContaining_matchingCauseButIncorrectMessage_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withCause(FileNotFoundException.class)
-                        .withMessageContaining(MESSAGE2));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class)
+                            .withCause(NullPointerException.class)
+                            .withMessageContaining(MESSAGE2));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message2]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.lang.NullPointerException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
     @Test
