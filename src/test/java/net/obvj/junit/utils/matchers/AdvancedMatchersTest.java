@@ -88,6 +88,16 @@ public class AdvancedMatchersTest
         },
         throwsException(IOException.class).withMessage("invalid"));
     }
+    
+    @Test
+    public void exception_procedureThrowingCheckedException_success()
+    {
+        assertThat(() ->
+        {
+            throw new ReflectiveOperationException("message");
+        },
+        exception(ReflectiveOperationException.class).withMessage("message"));
+    }
 
     @Test
     public void containsAll_moreThanOneString_createStringMatcherAccordingly()

@@ -16,6 +16,7 @@
 
 package net.obvj.junit.utils.matchers;
 
+import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 import net.obvj.junit.utils.Procedure;
@@ -168,6 +169,34 @@ public class AdvancedMatchers
     public static Matcher<Procedure> throwsNoException()
     {
         return ExceptionMatcher.throwsNoException();
+    }
+
+    /**
+     * This method behaves exactly the same as calling
+     * {@link AdvancedMatchers#throwsException(Class)}.
+     * <p>
+     * It was created primarily to allow a nested {@code ExceptionMatcher} for the cause of an
+     * exception.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code assertThat(() -> obj.doStuff("p1"),
+     *         throwsException(IllegalArgumentException.class)
+     *             .withCause(
+     *                 exception(FileNotFoundException.class)
+     *                     .withMessage("File p1 not found"));}
+     * </pre>
+     *
+     * @param exception the expected exception class. A null value is allowed, and means that
+     *                  no exception is expected
+     * @return the matcher
+     * @since 1.6.0
+     * @see AdvancedMatchers#throwsException(Class)
+     */
+    public static ExceptionMatcher exception(Class<? extends Exception> exception)
+    {
+        return ExceptionMatcher.exception(exception);
     }
 
     /**

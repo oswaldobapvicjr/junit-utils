@@ -162,10 +162,113 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         abstract void describeTo(ExceptionMatcher parent, Description description);
     }
 
-    private static final String NEW_LINE_INDENT = "\n          ";
+    /**
+     * Defines different strategies for validating the cause of an expected exception.
+     *
+     * @since 1.6.0
+     */
+    private enum CauseMatchingStrategy
+    {
+        /**
+         * Validates if a that the cause matches a given class.
+         *
+         * @since 1.6.0
+         */
+        EXPECTED_CLASS
+        {
+            @Override
+            boolean validateCause(ExceptionMatcher parent, Throwable throwable,
+                    Description mismatch)
+            {
+                Throwable cause = throwable.getCause();
+                if (cause == null && parent.expectedCause != null)
+                {
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was null");
+                    return false;
+                }
+                if (cause != null && (parent.expectedCause == null
+                        || !parent.expectedCause.isAssignableFrom(cause.getClass())))
+                {
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was: ")
+                            .appendText(nullSafeClassNameToText(cause.getClass()));
+                    return false;
+                }
+                return true;
+
+            }
+
+            @Override
+            void describeTo(ExceptionMatcher parent, Description description)
+            {
+                description.appendText(NEW_LINE_INDENT).appendText("and cause: ")
+                        .appendText(nullSafeClassNameToText(parent.expectedCause));
+
+            }
+        },
+
+        /**
+         * Uses an external matcher to validate the cause of an exception.
+         *
+         * @since 1.6.0
+         */
+        EXTERNAL_MATCHER
+        {
+            @Override
+            boolean validateCause(ExceptionMatcher parent, Throwable throwable,
+                    Description mismatch)
+            {
+                Procedure causeThrowingProcedure = new Procedure()
+                {
+                    @Override
+                    public void execute() throws Throwable
+                    {
+                        throw throwable.getCause();
+                    }
+                };
+                boolean matcherResult = parent.causeMatcher.matches(causeThrowingProcedure);
+                if (!matcherResult)
+                {
+                    mismatch.appendText(NEW_LINE_INDENT)
+                            .appendText("the cause did not match: (");
+                    parent.causeMatcher.describeMismatch(causeThrowingProcedure, mismatch);
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("}");
+                }
+                return matcherResult;
+            }
+
+            @Override
+            void describeTo(ExceptionMatcher parent, Description description)
+            {
+                description.appendText(NEW_LINE_INDENT).appendText("and cause: {");
+                parent.causeMatcher.describeTo(description);
+                description.appendText(NEW_LINE_INDENT).appendText("}");
+            }
+        };
+
+        /**
+         * Validates the throwable's cause.
+         *
+         * @param parent    the {@link ExceptionMatcher} instance to be handled
+         * @param throwable the Throwable whose message is to be validated
+         * @param mismatch  the description to be used for reporting in case of mismatch
+         * @return a flag indicating whether or not the matching has succeeded
+         */
+        abstract boolean validateCause(ExceptionMatcher parent, Throwable throwable, Description mismatch);
+
+        /**
+         * Describes the "expected" pat of the test description.
+         */
+        abstract void describeTo(ExceptionMatcher parent, Description description);
+    }
+
+    private static final String INDENT = "          ";
+    private static final String NEW_LINE_INDENT = "\n" + INDENT;
 
     private final Class<? extends Exception> expectedException;
+
+    private CauseMatchingStrategy causeMatchingStrategy;
     private Class<? extends Throwable> expectedCause;
+    private ExceptionMatcher causeMatcher;
 
     private boolean checkCauseFlag = false;
     private boolean checkMessageFlag = false;
@@ -253,6 +356,35 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     }
 
     /**
+     * This method behaves exactly the same as calling
+     * {@link ExceptionMatcher#throwsException(Class)}.
+     * <p>
+     * It was created primarily to allow a nested {@code ExceptionMatcher} for the cause of an
+     * exception.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code assertThat(() -> obj.doStuff("p1"),
+     *         throwsException(IllegalArgumentException.class)
+     *             .withCause(
+     *                 exception(FileNotFoundException.class)
+     *                     .withMessage("File p1 not found"));}
+     * </pre>
+     *
+     * @param exception the expected exception class. A null value is allowed, and means that
+     *                  no exception is expected
+     * @return the matcher
+     * @since 1.6.0
+     * @see ExceptionMatcher#throwsException(Class)
+     */
+    @Factory
+    public static ExceptionMatcher exception(Class<? extends Exception> exception)
+    {
+        return new ExceptionMatcher(exception);
+    }
+
+    /**
      * Creates a matcher that matches if the examined procedure throws no exception.
      * <p>
      * For example:
@@ -288,8 +420,8 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * <pre>
      * {@code
      * assertThat(() -> obj.doStuff("p1"),
-     *         throwsException(IllegalStateException.class)
-     *             .withCause(FileNotFoundException.class));}
+     *         throwsException(IllegalStateException.class).withCause(FileNotFoundException.class));
+     * }
      * </pre>
      *
      * The matcher matches if the actual cause class is either the same as, or is a child of,
@@ -309,8 +441,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * specified class.
      * </p>
      *
-     * @param cause the expected cause. A null value is allowed, and means that an exception
-     *              without cause is expected
+     * @param cause the expected cause; not null
      * @return the matcher, incremented with a given cause for testing
      * @since 1.1.0
      */
@@ -318,7 +449,46 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     {
         expectedCause = cause;
         checkCauseFlag = true;
+        causeMatchingStrategy = CauseMatchingStrategy.EXPECTED_CLASS;
         return this;
+    }
+
+    /**
+     * Assigns another {@code ExceptionMatcher} to be used for the exception cause validation.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * {@code assertThat(() -> obj.doStuff("p1"),
+     *         throwsException(IllegalArgumentException.class)
+     *             .withCause(
+     *                 exception(FileNotFoundException.class)
+     *                     .withMessage("File p1 not found"));}
+     * </pre>
+     *
+     *
+     * @param matcher the matcher to be used in combination for exception cause validation
+     * @return the matcher, incremented with the specified matcher for testing
+     * @since 1.6.0
+     * @see ExceptionMatcher#exception(Class)
+     */
+    public ExceptionMatcher withCause(ExceptionMatcher matcher)
+    {
+        causeMatcher = matcher;
+        checkCauseFlag = true;
+        causeMatchingStrategy = CauseMatchingStrategy.EXTERNAL_MATCHER;
+        return this;
+    }
+
+    /**
+     * Instruct the matcher to ensure that the expected exception has no cause.
+     *
+     * @return the matcher, enabled for cause cause checking, and expecting none
+     * @since 1.6.0
+     */
+    public ExceptionMatcher withNoCause()
+    {
+        return withCause((Class<? extends Throwable>) null);
     }
 
     /**
@@ -502,19 +672,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      */
     private boolean validateCause(Throwable throwable, Description mismatch)
     {
-        Throwable cause = throwable.getCause();
-        if (cause == null && expectedCause != null)
-        {
-            mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was null");
-            return false;
-        }
-        if (cause != null && (expectedCause == null || !expectedCause.isAssignableFrom(cause.getClass())))
-        {
-            mismatch.appendText(NEW_LINE_INDENT).appendText("the cause was: ")
-                    .appendText(nullSafeClassNameToText(cause.getClass()));
-            return false;
-        }
-        return true;
+        return causeMatchingStrategy.validateCause(this, throwable, mismatch);
     }
 
     /**
@@ -532,8 +690,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         }
         if (checkCauseFlag)
         {
-            description.appendText(NEW_LINE_INDENT).appendText("and cause: ")
-                    .appendText(nullSafeClassNameToText(expectedCause));
+            causeMatchingStrategy.describeTo(this, description);
         }
     }
 
