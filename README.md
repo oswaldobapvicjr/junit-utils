@@ -59,6 +59,17 @@ assertThat(() -> myObject.doStuff(null),
             .withCause(NullPointerException.class));
 ```
 
+And more:
+
+```java
+assertThat(() -> myObject.doStuff(null),
+        throwsException(MyException.class).withMessageContaining("ERR-120008")
+            .withCause(
+                exception(NullPointerException.class)
+                    .withMessage("stuff cannot be null")));
+```
+
+
 ### Testing that instantiation is not allowed
 
 The following assertion is particularly useful for utility classes:
