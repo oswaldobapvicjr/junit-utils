@@ -174,8 +174,8 @@ public class AdvancedMatchers
      * This method behaves exactly the same as calling
      * {@link AdvancedMatchers#throwsException(Class)}.
      * <p>
-     * It was created primarily to allow a nested {@code ExceptionMatcher} for the cause of an
-     * exception.
+     * It was created primarily to allow a nested {@code ExceptionMatcher} to validate the
+     * cause of an exception.
      * <p>
      * For example:
      *
@@ -189,7 +189,7 @@ public class AdvancedMatchers
      *
      * @param exception the expected exception class. A null value is allowed, and means that
      *                  no exception is expected
-     * @return the matcher
+     * @return a new matcher
      * @since 1.6.0
      * @see AdvancedMatchers#throwsException(Class)
      */

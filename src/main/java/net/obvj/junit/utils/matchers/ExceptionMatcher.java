@@ -149,8 +149,8 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         /**
          * Validates the throwable's message.
          *
-         * @param parent    the {@link ExceptionMatcher} instance to be handled
-         * @param throwable the Throwable whose message is to be validated
+         * @param parent    the {@code ExceptionMatcher} instance to be handled
+         * @param throwable the {@code Throwable} whose message is to be validated
          * @param mismatch  the description to be used for reporting in case of mismatch
          * @return a flag indicating whether or not the matching has succeeded
          */
@@ -170,15 +170,14 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     private enum CauseMatchingStrategy
     {
         /**
-         * Validates if a that the cause matches a given class.
+         * Validates that the cause matches (or is assignable from) a given class.
          *
          * @since 1.6.0
          */
         EXPECTED_CLASS
         {
             @Override
-            boolean validateCause(ExceptionMatcher parent, Throwable throwable,
-                    Description mismatch)
+            boolean validateCause(ExceptionMatcher parent, Throwable throwable, Description mismatch)
             {
                 Throwable cause = throwable.getCause();
                 if (cause == null && parent.expectedCause != null)
@@ -194,7 +193,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
                     return false;
                 }
                 return true;
-
             }
 
             @Override
@@ -207,15 +205,14 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         },
 
         /**
-         * Uses an external matcher to validate the cause of an exception.
+         * Uses a nested {@code ExceptionMatcher} to validate the cause of an exception.
          *
          * @since 1.6.0
          */
-        EXTERNAL_MATCHER
+        NESTED_MATCHER
         {
             @Override
-            boolean validateCause(ExceptionMatcher parent, Throwable throwable,
-                    Description mismatch)
+            boolean validateCause(ExceptionMatcher parent, Throwable throwable, Description mismatch)
             {
                 Procedure causeThrowingProcedure = new Procedure()
                 {
@@ -228,8 +225,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
                 boolean matcherResult = parent.causeMatcher.matches(causeThrowingProcedure);
                 if (!matcherResult)
                 {
-                    mismatch.appendText(NEW_LINE_INDENT)
-                            .appendText("the cause did not match: (");
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("the cause did not match: (");
                     parent.causeMatcher.describeMismatch(causeThrowingProcedure, mismatch);
                     mismatch.appendText(NEW_LINE_INDENT).appendText("}");
                 }
@@ -248,8 +244,8 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         /**
          * Validates the throwable's cause.
          *
-         * @param parent    the {@link ExceptionMatcher} instance to be handled
-         * @param throwable the Throwable whose message is to be validated
+         * @param parent    the {@code ExceptionMatcher} instance to be handled
+         * @param throwable the {@code Throwable} whose message is to be validated
          * @param mismatch  the description to be used for reporting in case of mismatch
          * @return a flag indicating whether or not the matching has succeeded
          */
@@ -359,8 +355,8 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * This method behaves exactly the same as calling
      * {@link ExceptionMatcher#throwsException(Class)}.
      * <p>
-     * It was created primarily to allow a nested {@code ExceptionMatcher} for the cause of an
-     * exception.
+     * It was created primarily to allow a nested {@code ExceptionMatcher} to validate the
+     * cause of an exception.
      * <p>
      * For example:
      *
@@ -374,7 +370,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      *
      * @param exception the expected exception class. A null value is allowed, and means that
      *                  no exception is expected
-     * @return the matcher
+     * @return a new matcher
      * @since 1.6.0
      * @see ExceptionMatcher#throwsException(Class)
      */
@@ -441,7 +437,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * specified class.
      * </p>
      *
-     * @param cause the expected cause; not null
+     * @param cause the expected cause
      * @return the matcher, incremented with a given cause for testing
      * @since 1.1.0
      */
@@ -476,7 +472,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     {
         causeMatcher = matcher;
         checkCauseFlag = true;
-        causeMatchingStrategy = CauseMatchingStrategy.EXTERNAL_MATCHER;
+        causeMatchingStrategy = CauseMatchingStrategy.NESTED_MATCHER;
         return this;
     }
 
