@@ -5,7 +5,7 @@
 
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.7.0-SNAPSHOT</version>
     <name>junit-utils</name>
     <description>Common utilities for working with JUnit</description>
     <url>https://obvj.net/junit-utils</url>
