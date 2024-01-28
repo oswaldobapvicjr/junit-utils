@@ -16,7 +16,6 @@
 
 package net.obvj.junit.utils.matchers;
 
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
 import net.obvj.junit.utils.Procedure;
