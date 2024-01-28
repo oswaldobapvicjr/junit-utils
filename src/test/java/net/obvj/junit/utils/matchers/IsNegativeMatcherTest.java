@@ -18,10 +18,11 @@ package net.obvj.junit.utils.matchers;
 
 import static net.obvj.junit.utils.matchers.IsNegativeMatcher.isNegative;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the {@link IsNegativeMatcher} class.
@@ -29,48 +30,49 @@ import org.junit.Test;
  * @author oswaldo.bapvic.jr
  * @since 1.3.0
  */
-public class IsNegativeMatcherTest
+class IsNegativeMatcherTest
 {
-    @Test(expected = AssertionError.class)
-    public void isNegative_null_assertionError()
+    @Test
+    void isNegative_null_assertionError()
     {
-        assertThat(null, isNegative());
+        assertThrows(AssertionError.class, () -> assertThat(null, isNegative()));
     }
 
     @Test
-    public void isNegative_negativeInt_success()
+    void isNegative_negativeInt_success()
     {
         assertThat(-5, isNegative());
     }
 
-    @Test(expected = AssertionError.class)
-    public void isNegative_positiveInt_assertionError()
+    @Test
+    void isNegative_positiveInt_assertionError()
     {
-        assertThat(5, isNegative());
+        assertThrows(AssertionError.class, () -> assertThat(5, isNegative()));
     }
 
     @Test
-    public void isNegative_negativeDouble_success()
+    void isNegative_negativeDouble_success()
     {
         assertThat(-9999d, isNegative());
     }
 
-    @Test(expected = AssertionError.class)
-    public void isNegative_positiveDouble_assertionError()
+    @Test
+    void isNegative_positiveDouble_assertionError()
     {
-        assertThat(45.9, isNegative());
+        assertThrows(AssertionError.class, () -> assertThat(45.9, isNegative()));
     }
 
     @Test
-    public void isNegative_negativeBigDecimal_success()
+    void isNegative_negativeBigDecimal_success()
     {
         assertThat(BigDecimal.valueOf(-1), isNegative());
     }
 
-    @Test(expected = AssertionError.class)
-    public void isNegative_positiveBigDecimal_assertionError()
+    @Test
+    void isNegative_positiveBigDecimal_assertionError()
     {
-        assertThat(BigDecimal.valueOf(Double.MAX_VALUE), isNegative());
+        assertThrows(AssertionError.class,
+                () -> assertThat(BigDecimal.valueOf(Double.MAX_VALUE), isNegative()));
     }
 
 }

@@ -16,7 +16,9 @@
 
 package net.obvj.junit.utils.matchers;
 
-import static net.obvj.junit.utils.matchers.ExceptionMatcher.*;
+import static net.obvj.junit.utils.matchers.ExceptionMatcher.exception;
+import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsException;
+import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsNoException;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -27,14 +29,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.hamcrest.Matcher;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 /**
  * Unit tests for the {@link ExceptionMatcher} class.
  *
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
  */
-public class ExceptionMatcherTest
+class ExceptionMatcherTest
 {
     private static final String ERR_0001 = "ERR-0001";
     private static final String MESSAGE1 = "message1";
@@ -64,107 +66,195 @@ public class ExceptionMatcherTest
         throw new IllegalArgumentException();
     };
 
+    private static String[] extractMessageLines(Throwable t)
+    {
+        return t.getMessage().split("\\R");
+    }
+
     // ================================
     // Test methods - start
     // ================================
 
     @Test
-    public void throwsException_nullWithRunnableNotThrowingException_succeeeds()
+    void throwsException_nullWithRunnableNotThrowingException_succeeeds()
     {
         assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsException(null));
     }
 
-    @Test(expected = AssertionError.class)
-    public void throwsException_nullWithRunnableThrowingException_failure()
+    @Test
+    void throwsException_nullWithRunnableThrowingException_failure()
     {
-        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(null));
+        try
+        {
+            assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(null));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("no exception"));
+            assertThat(lines[3].trim(), equalTo("but:"));
+            assertThat(lines[4].trim(), equalTo("was java.lang.NullPointerException"));
+        }
     }
 
     @Test
-    public void throwsNoException_runnableNotThrowingException_succeeeds()
+    void throwsNoException_runnableNotThrowingException_succeeeds()
     {
         assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsNoException());
     }
 
-    @Test(expected = AssertionError.class)
-    public void throwsNoException_runnableThrowingException_failure()
+    @Test
+    void throwsNoException_runnableThrowingException_failure()
     {
-        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsNoException());
+        try
+        {
+            assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsNoException());
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("no exception"));
+            assertThat(lines[3].trim(), equalTo("but:"));
+            assertThat(lines[4].trim(), equalTo("was java.lang.NullPointerException"));
+        }
     }
 
     @Test
-    public void throwsException_noArgumentWithRunnableThrowingException_success()
+    void throwsException_noArgumentWithRunnableThrowingException_success()
     {
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException());
     }
 
-    @Test(expected = AssertionError.class)
-    public void throwsException_noArgumentWithRunnableNotThrowingException_failue()
+    @Test
+    void throwsException_noArgumentWithRunnableNotThrowingException_failue()
     {
-        assertThat(() -> MESSAGE2.equals(MESSAGE1), throwsException());
+        try
+        {
+            assertThat(() -> MESSAGE2.equals(MESSAGE1), throwsException());
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.Exception"));
+            assertThat(lines[3].trim(), equalTo("but:"));
+            assertThat(lines[4].trim(), equalTo("no exception was thrown"));
+        }
     }
 
     @Test
-    public void throwsException_correctExceptionWithNoCause_succeeds()
+    void throwsException_correctExceptionWithNoCause_succeeds()
     {
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(NullPointerException.class));
     }
 
     @Test
-    public void throwsException_parentExceptionExpectedAndChildExceptionThrown_succeeds()
+    void throwsException_parentExceptionExpectedAndChildExceptionThrown_succeeds()
     {
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(RuntimeException.class));
         assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(Exception.class));
     }
 
     @Test
-    public void throwsException_correctExceptionWithCause_succeeds()
+    void throwsException_correctExceptionWithCause_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(), throwsException(IllegalArgumentException.class));
     }
 
-    @Test(expected = AssertionError.class)
-    public void throwsException_incorrectException_fails()
+    @Test
+    void throwsException_incorrectException_fails()
     {
-        assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(IllegalArgumentException.class));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void throwsException_runnableThrowingNoException_fails()
-    {
-        assertThat(() -> MESSAGE1.equals(MESSAGE1), throwsException(NullPointerException.class));
+        try
+        {
+            assertThat(() -> NULL_STRING.equals(MESSAGE1),
+                    throwsException(IllegalArgumentException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("but:"));
+            assertThat(lines[4].trim(), equalTo("was java.lang.NullPointerException"));
+        }
     }
 
     @Test
-    public void withCause_correctCause_succeeds()
+    void throwsException_runnableThrowingNoException_fails()
+    {
+        try
+        {
+            assertThat(() -> MESSAGE1.equals(MESSAGE1),
+                    throwsException(NullPointerException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.NullPointerException"));
+            assertThat(lines[3].trim(), equalTo("but:"));
+            assertThat(lines[4].trim(), equalTo("no exception was thrown"));
+        }
+    }
+
+    @Test
+    void withCause_correctCause_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class).withCause(NullPointerException.class));
     }
 
     @Test
-    public void withCause_parentCauseExpectedAndIsChildCause_succeeds()
+    void withCause_parentCauseExpectedAndIsChildCause_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class).withCause(RuntimeException.class));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withCause_incorrectCause_fails()
+    @Test
+    void withCause_incorrectCause_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
-                throwsException(IllegalArgumentException.class).withCause(FileNotFoundException.class));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withCause_setButNoCause_fails()
-    {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
-                throwsException(IllegalArgumentException.class).withCause(NullPointerException.class));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                    throwsException(IllegalArgumentException.class)
+                            .withCause(FileNotFoundException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("and cause: java.io.FileNotFoundException"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the cause was: java.lang.NullPointerException"));
+        }
     }
 
     @Test
-    public void withCause_causeMatcherAndCorrectCauseClass_succeeds()
+    void withCause_setButNoCause_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
+                    throwsException(IllegalArgumentException.class)
+                            .withCause(NullPointerException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("and cause: java.lang.NullPointerException"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the cause was null"));
+        }
+    }
+
+    @Test
+    void withCause_causeMatcherAndCorrectCauseClass_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class)
@@ -172,23 +262,39 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    public void withCause_causeMatcherAndCauseClassIsChild_succeeds()
+    void withCause_causeMatcherAndCauseClassIsChild_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class)
                         .withCause(exception(RuntimeException.class)));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withCause_causeMatcherAndIncorrectCauseClass_succeeds()
+    @Test
+    void withCause_causeMatcherAndIncorrectCauseClass_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
-                throwsException(IllegalArgumentException.class)
-                        .withCause(exception(FileNotFoundException.class)));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                    throwsException(IllegalArgumentException.class)
+                            .withCause(exception(FileNotFoundException.class)));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("and cause: {"));
+            assertThat(lines[4].trim(), equalTo("java.io.FileNotFoundException"));
+            assertThat(lines[5].trim(), equalTo("}"));
+            assertThat(lines[6].trim(), equalTo("but:"));
+            assertThat(lines[7].trim(), equalTo("the cause did not match: {"));
+            assertThat(lines[8].trim(), equalTo("was java.lang.NullPointerException"));
+            assertThat(lines[9].trim(), equalTo("}"));
+        }
     }
 
     @Test
-    public void withCause_causeMatcherAndCorrectCauseClassAndMessage_succeeds()
+    void withCause_causeMatcherAndCorrectCauseClassAndMessage_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
                 throwsException(IllegalArgumentException.class)
@@ -197,200 +303,414 @@ public class ExceptionMatcherTest
                                 .withMessage(NPE_MESSAGE)));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withCause_causeMatcherAndCorrectCauseClassAndIncorrectMessage_succeeds()
+    @Test
+    void withCause_causeMatcherAndCorrectCauseClassAndIncorrectMessage_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
-                throwsException(IllegalArgumentException.class)
-                        .withCause(exception(NullPointerException.class)
-                                .withMessage(IAE_MESSAGE)));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                    throwsException(IllegalArgumentException.class).withCause(
+                            exception(NullPointerException.class).withMessage(IAE_MESSAGE)));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("and cause: {"));
+            assertThat(lines[4].trim(), equalTo("java.lang.NullPointerException"));
+            assertThat(lines[5].trim(), equalTo("with message: \"iae message\""));
+            assertThat(lines[6].trim(), equalTo("}"));
+            assertThat(lines[7].trim(), equalTo("but:"));
+            assertThat(lines[8].trim(), equalTo("the cause did not match: {"));
+            assertThat(lines[9].trim(), equalTo("the message was \"npe message\""));
+            assertThat(lines[10].trim(), equalTo("}"));
+        }
     }
 
 
     @Test
-    public void withNoCause_nullAndNoCause_succeeds()
+    void withNoCause_nullAndNoCause_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withNoCause());
     }
 
-    @Test(expected = AssertionError.class)
-    public void withNoCause_nullButHasCause_fails()
+    @Test
+    void withNoCause_nullButHasCause_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
-                throwsException(IllegalArgumentException.class).withNoCause());
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_IAE_WITH_CAUSE_NPE.run(),
+                    throwsException(IllegalArgumentException.class).withNoCause());
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("and cause: no exception"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the cause was: java.lang.NullPointerException"));
+        }
     }
 
     @Test
-    public void withMessage_equalToAndStringMatching_suceeds()
+    void withMessage_equalToAndStringMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalStateException.class).withMessage(equalTo(MESSAGE_ERR_0001_FULL)));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessage_equalToAndStringNotMatching_fails()
+    @Test
+    void withMessage_equalToAndStringNotMatching_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class).withMessage(equalTo(MESSAGE1)));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalStateException.class).withMessage(equalTo(MESSAGE1)));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message: \"message1\""));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
     @Test
-    public void withMessage_combinedStringMatcher_suceeds()
+    void withMessage_combinedStringMatcher_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalStateException.class).withMessage(containsAny(MESSAGE1).ignoreCase()));
     }
 
     @Test
-    public void withMessage_combinedMatcherAndStringMatching_suceeds()
+    void withMessage_combinedMatcherAndStringMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalStateException.class)
                         .withMessage(either(startsWith(ERR_0001)).or(containsAny(MESSAGE1).ignoreCase())));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessage_combinedMatcherAndStringNotMatching_fails()
+    @Test
+    void withMessage_combinedMatcherAndStringNotMatching_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class)
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalStateException.class)
                         .withMessage(either(startsWith(MESSAGE1)).or(containsAny(MESSAGE2).ignoreCase())));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withMessage_startsWithButNoMessage_fails()
-    {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
-                throwsException(IllegalArgumentException.class).withMessage(startsWith(ERR_0001)));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message: (a string starting with \"message1\" or a string containing ANY of the specified substrings [message2] (ignore case))"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
     @Test
-    public void withMessage_nullAndHasNotMessage_suceeds()
+    void withMessage_startsWithButNoMessage_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
+                    throwsException(IllegalArgumentException.class)
+                            .withMessage(startsWith(ERR_0001)));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("with message: a string starting with \"ERR-0001\""));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was null"));
+        }
+    }
+
+    @Test
+    void withMessage_nullAndHasNotMessage_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withMessage((Matcher<String>) null));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessage_nullButHasMessage_fails()
+    @Test
+    void withMessage_nullButHasMessage_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class).withMessage((Matcher<String>) null));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalStateException.class)
+                            .withMessage((Matcher<String>) null));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message: <null>"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
     @Test
-    public void withMessage_stringAndMatching_suceeds()
+    void withMessage_stringAndMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalStateException.class).withMessage(MESSAGE_ERR_0001_FULL));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessage_stringAndNotMatching_fails()
+    @Test
+    void withMessage_stringAndNotMatching_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class).withMessage(MESSAGE1));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalStateException.class).withMessage(MESSAGE1));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message: \"message1\""));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
     @Test
-    public void withMessageContaining_oneSubstringMatching_suceeds()
+    void withMessageContaining_oneSubstringMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalStateException.class).withMessageContaining(MESSAGE1));
     }
 
     @Test
-    public void withMessageContaining_twoSubstringsMatching_suceeds()
+    void withMessageContaining_twoSubstringsMatching_suceeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
                 throwsException(IllegalStateException.class).withMessageContaining(ERR_0001, MESSAGE1));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessageContaining_oneSubstringNotMatching_suceeds()
+    @Test
+    void withMessageContaining_oneSubstringNotMatching_suceeds()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withMessageContaining_twoSubstringsButOneNotMatching_suceeds()
-    {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(ERR_0001, MESSAGE2));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withMessageContaining_oneSubstringMatchingButExceptionNotMatching_fails()
-    {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalArgumentException.class).withMessageContaining(MESSAGE2));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withMessageContaining_oneSubstringButNoMessage_fails()
-    {
-        assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
-                throwsException(IllegalArgumentException.class).withMessageContaining(MESSAGE1));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message2]"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
     @Test
-    public void withMessageContaining_nullAndNoMessage_succeeds()
+    void withMessageContaining_twoSubstringsBothMatching_suceeds()
+    {
+        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                throwsException(IllegalStateException.class).withMessageContaining(ERR_0001, MESSAGE1));
+    }
+
+    @Test
+    void withMessageContaining_twoSubstringsButOneNotMatching_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalStateException.class).withMessageContaining(ERR_0001, MESSAGE2));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [ERR-0001, message2]"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
+    }
+
+    @Test
+    void withMessageContaining_oneSubstringMatchingButExceptionNotMatching_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalArgumentException.class)
+                            .withMessageContaining(MESSAGE2));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message2]"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("was java.lang.IllegalStateException"));
+        }
+    }
+
+    @Test
+    void withMessageContaining_oneSubstringButNoMessage_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
+                    throwsException(IllegalArgumentException.class)
+                            .withMessageContaining(MESSAGE1));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalArgumentException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message1]"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was null"));
+        }
+    }
+
+    @Test
+    void withMessageContaining_nullAndNoMessage_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_IAE_WITH_NO_CAUSE_AND_NO_MESSAGE.run(),
                 throwsException(IllegalArgumentException.class).withMessageContaining((String[]) null));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessageContaining_nullButHasMessage_fails()
+    @Test
+    void withMessageContaining_nullButHasMessage_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
-                throwsException(IllegalArgumentException.class).withMessageContaining((String[]) null));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_NO_CAUSE.run(),
+                    throwsException(IllegalStateException.class)
+                            .withMessageContaining((String[]) null));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: []"));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
     }
 
     @Test
-    public void withMessageContainingAndCause_matchingMessageAndCause_succeeds()
+    void withMessageContainingAndCause_matchingMessageAndCause_succeeds()
     {
         assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
                 throwsException(IllegalStateException.class).withMessageContaining(MESSAGE1)
                         .withCause(NullPointerException.class));
     }
 
-    @Test(expected = AssertionError.class)
-    public void withMessageContainingAndCause_matchingMessageButIncorrectCause_fails()
+    @Test
+    void withMessageContainingAndCause_matchingMessageButIncorrectCause_fails()
     {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE1)
-                        .withCause(FileNotFoundException.class));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withMessageContainingAndCause_matchingCauseButIncorrectMessage_fails()
-    {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2)
-                        .withCause(FileNotFoundException.class));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withCauseAndMessageContaining_matchingMessageButIncorrectCause_fails()
-    {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withCause(FileNotFoundException.class)
-                        .withMessageContaining(MESSAGE1));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void withCauseAndMessageContaining_matchingCauseButIncorrectMessage_fails()
-    {
-        assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
-                throwsException(IllegalStateException.class).withCause(FileNotFoundException.class)
-                        .withMessageContaining(MESSAGE2));
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class).withMessageContaining(MESSAGE1)
+                            .withCause(FileNotFoundException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message1]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.io.FileNotFoundException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the cause was: java.lang.NullPointerException"));
+        }
     }
 
     @Test
-    public void throwsException_checkedException_success()
+    void withMessageContainingAndCause_matchingCauseButIncorrectMessage_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class).withMessageContaining(MESSAGE2)
+                            .withCause(NullPointerException.class));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message2]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.lang.NullPointerException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
+    }
+
+    @Test
+    void withCauseAndMessageContaining_matchingMessageButIncorrectCause_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class)
+                            .withCause(FileNotFoundException.class)
+                            .withMessageContaining(MESSAGE1));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message1]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.io.FileNotFoundException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the cause was: java.lang.NullPointerException"));
+        }
+    }
+
+    @Test
+    void withCauseAndMessageContaining_matchingCauseButIncorrectMessage_fails()
+    {
+        try
+        {
+            assertThat(() -> RUNNABLE_THROWS_ISE_WITH_MESSAGE_AND_CAUSE_NPE.run(),
+                    throwsException(IllegalStateException.class)
+                            .withCause(NullPointerException.class)
+                            .withMessageContaining(MESSAGE2));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo("java.lang.IllegalStateException"));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message2]"));
+            assertThat(lines[4].trim(), equalTo("and cause: java.lang.NullPointerException"));
+            assertThat(lines[5].trim(), equalTo("but:"));
+            assertThat(lines[6].trim(), equalTo("the message was \"[ERR-0001] message1\""));
+        }
+    }
+
+    @Test
+    void throwsException_checkedException_success()
     {
         assertThat(() ->
         {

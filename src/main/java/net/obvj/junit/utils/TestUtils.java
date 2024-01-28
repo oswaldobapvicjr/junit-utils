@@ -19,8 +19,8 @@ package net.obvj.junit.utils;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -99,7 +99,8 @@ public class TestUtils
             // First, check that all constructors are private
             for (Constructor<?> constructor : targetClass.getDeclaredConstructors())
             {
-                assertTrue(String.format(THE_CONSTRUCTOR_IS_NOT_PRIVATE, constructor), Modifier.isPrivate(constructor.getModifiers()));
+                assertTrue(Modifier.isPrivate(constructor.getModifiers()),
+                        String.format(THE_CONSTRUCTOR_IS_NOT_PRIVATE, constructor));
             }
 
             // Then, try to create an instance using the default constructor
@@ -344,8 +345,8 @@ public class TestUtils
     {
         Arrays.stream(expectedStrings)
                 .forEach(expectedString -> assertTrue(
-                        String.format(EXPECTED_STRING_NOT_FOUND, expectedString, testString),
-                        testString.contains(expectedString)));
+                        testString.contains(expectedString),
+                        String.format(EXPECTED_STRING_NOT_FOUND, expectedString, testString)));
     }
 
     /**
@@ -358,8 +359,8 @@ public class TestUtils
     {
         Arrays.stream(expectedStrings)
                 .forEach(expectedString -> assertFalse(
-                        String.format(UNEXPECTED_STRING_FOUND, expectedString, testString),
-                        testString.contains(expectedString)));
+                        testString.contains(expectedString),
+                        String.format(UNEXPECTED_STRING_FOUND, expectedString, testString)));
     }
 
     /**

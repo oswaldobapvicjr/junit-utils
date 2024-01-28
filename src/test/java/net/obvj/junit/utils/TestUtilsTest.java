@@ -16,18 +16,19 @@
 
 package net.obvj.junit.utils;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.function.Supplier;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the {@link TestUtils} class.
  *
  * @author oswaldo.bapvic.jr
  */
-public class TestUtilsTest
+class TestUtilsTest
 {
     private static final String THE_QUICK_BROWN_FOX = "The quick brown fox jumps over the lazy dog";
     private static final String[] ANIMALS = { "fox", "dog" };
@@ -56,42 +57,46 @@ public class TestUtilsTest
     };
 
     @Test
-    public void assertInstantiationNotAllowed_withClassWithPrivateConstructor_suceeds()
+    void assertInstantiationNotAllowed_withClassWithPrivateConstructor_suceeds()
             throws ReflectiveOperationException
     {
         TestUtils.assertInstantiationNotAllowed(TestUtils.class);
     }
 
     @Test
-    public void assertInstantiationNotAllowed_withExpectedThrowableAndClassWithPrivateConstructor_suceeds()
+    void assertInstantiationNotAllowed_withExpectedThrowableAndClassWithPrivateConstructor_suceeds()
             throws ReflectiveOperationException
     {
         TestUtils.assertInstantiationNotAllowed(TestUtils.class, UnsupportedOperationException.class);
     }
 
     @Test
-    public void assertInstantiationNotAllowed_withAllParamsAndClassWithPrivateConstructor_suceeds()
+    void assertInstantiationNotAllowed_withAllParamsAndClassWithPrivateConstructor_suceeds()
             throws ReflectiveOperationException
     {
         TestUtils.assertInstantiationNotAllowed(TestUtils.class, UnsupportedOperationException.class, "Utility class");
     }
 
-    @Test(expected = AssertionError.class)
-    public void assertInstantiationNotAllowed_withUnexpectedMessageAndClassWithPrivateConstructor_fails()
+    @Test
+    void assertInstantiationNotAllowed_withUnexpectedMessageAndClassWithPrivateConstructor_fails()
             throws ReflectiveOperationException
     {
-        TestUtils.assertInstantiationNotAllowed(TestUtils.class, UnsupportedOperationException.class, "Invalid message");
-    }
-
-    @Test(expected = AssertionError.class)
-    public void assertInstantiationNotAllowed_withUnexpectedThrowableAndClassWithPrivateConstructor_fails()
-            throws ReflectiveOperationException
-    {
-        TestUtils.assertInstantiationNotAllowed(TestUtils.class, NullPointerException.class, "Utility class");
+        assertThrows(AssertionError.class,
+                () -> TestUtils.assertInstantiationNotAllowed(TestUtils.class,
+                        UnsupportedOperationException.class, "Invalid message"));
     }
 
     @Test
-    public void assertInstantiationNotAllowed_classWithPublicConstructor_fails()
+    void assertInstantiationNotAllowed_withUnexpectedThrowableAndClassWithPrivateConstructor_fails()
+            throws ReflectiveOperationException
+    {
+        assertThrows(AssertionError.class,
+                () -> TestUtils.assertInstantiationNotAllowed(TestUtils.class,
+                        NullPointerException.class, "Utility class"));
+    }
+
+    @Test
+    void assertInstantiationNotAllowed_classWithPublicConstructor_fails()
     {
         TestUtils.assertException(AssertionError.class, null, null, () ->
         {
@@ -108,7 +113,7 @@ public class TestUtilsTest
     }
 
     @Test
-    public void assertInstantiationNotAllowed_classWithPrivateConstructor_fails()
+    void assertInstantiationNotAllowed_classWithPrivateConstructor_fails()
     {
         TestUtils.assertException(AssertionError.class, null, null, () ->
         {
@@ -133,64 +138,64 @@ public class TestUtilsTest
     }
 
     @Test
-    public void assertException_throwableAndExpectedClass()
+    void assertException_throwableAndExpectedClass()
     {
         TestUtils.assertException(IllegalArgumentException.class, ILLEGAL_ARGUMENT_EXCEPTION);
     }
 
     @Test
-    public void assertException_supplierAndExpectedClass()
+    void assertException_supplierAndExpectedClass()
     {
         TestUtils.assertException(IllegalStateException.class, ILLEGAL_STATE_SUPPLIER);
     }
 
     @Test
-    public void assertException_runnableAndExpectedClass()
+    void assertException_runnableAndExpectedClass()
     {
         TestUtils.assertException(UnsupportedOperationException.class, UNSUPPORTED_OPERATION_RUNNABLE);
     }
 
     @Test
-    public void assertException_throwableAndExpectedClassAndMessage()
+    void assertException_throwableAndExpectedClassAndMessage()
     {
         TestUtils.assertException(IllegalArgumentException.class, MESSAGE1, ILLEGAL_ARGUMENT_EXCEPTION);
     }
 
     @Test
-    public void assertException_runnableAndExpectedClassAndMessage()
+    void assertException_runnableAndExpectedClassAndMessage()
     {
         TestUtils.assertException(UnsupportedOperationException.class, MESSAGE1, UNSUPPORTED_OPERATION_RUNNABLE);
     }
 
     @Test
-    public void assertException_supplierAndExpectedClassAndMessage()
+    void assertException_supplierAndExpectedClassAndMessage()
     {
         TestUtils.assertException(IllegalStateException.class, MESSAGE1, ILLEGAL_STATE_SUPPLIER);
     }
 
     @Test
-    public void assertException_throwableAndExpectedClassAndMessageAndCause()
+    void assertException_throwableAndExpectedClassAndMessageAndCause()
     {
         TestUtils.assertException(IllegalArgumentException.class, MESSAGE1, NullPointerException.class,
                 ILLEGAL_ARGUMENT_EXCEPTION);
     }
 
     @Test
-    public void assertException_supplierAndExpectedClassAndMessageAndCause()
+    void assertException_supplierAndExpectedClassAndMessageAndCause()
     {
         TestUtils.assertException(IllegalStateException.class, MESSAGE1, NullPointerException.class,
                 ILLEGAL_STATE_SUPPLIER);
     }
 
     @Test
-    public void assertException_runnableAndExpectedClassAndMessageAndCause()
+    void assertException_runnableAndExpectedClassAndMessageAndCause()
     {
         TestUtils.assertException(UnsupportedOperationException.class, MESSAGE1, IllegalArgumentException.class,
                 UNSUPPORTED_OPERATION_RUNNABLE);
     }
 
     @Test
-    public void assertException_supplierAndExpectedClassButExceptionNotThrown_fails()
+    void assertException_supplierAndExpectedClassButExceptionNotThrown_fails()
     {
         TestUtils.assertException(AssertionError.class,
                 String.format(TestUtils.EXPECTED_BUT_NOT_THROWN, UnsupportedOperationException.class.getName()),
@@ -198,78 +203,84 @@ public class TestUtilsTest
     }
 
     @Test
-    public void assertException_runnableAndExpectedClassButExceptionNotThrown_fails()
+    void assertException_runnableAndExpectedClassButExceptionNotThrown_fails()
     {
         TestUtils.assertException(AssertionError.class,
                 String.format(TestUtils.EXPECTED_BUT_NOT_THROWN, UnsupportedOperationException.class.getName()),
                 () -> TestUtils.assertException(UnsupportedOperationException.class, NO_EXCEPTION_RUNNABLE));
     }
 
-    @Test(expected = AssertionError.class)
-    public void assertException_invalidThrowable_fails()
+    @Test
+    void assertException_invalidThrowable_fails()
     {
-        TestUtils.assertException(IllegalStateException.class, ILLEGAL_ARGUMENT_EXCEPTION);
-    }
-
-    @Test(expected = AssertionError.class)
-    public void assertException_invalidMessage_fails()
-    {
-        TestUtils.assertException(IllegalArgumentException.class, "message2", ILLEGAL_ARGUMENT_EXCEPTION);
-    }
-
-    @Test(expected = AssertionError.class)
-    public void assertException_invalidCause_fails()
-    {
-        TestUtils.assertException(IllegalArgumentException.class, MESSAGE1, IllegalStateException.class,
-                ILLEGAL_ARGUMENT_EXCEPTION);
+        assertThrows(AssertionError.class, () -> TestUtils
+                .assertException(IllegalStateException.class, ILLEGAL_ARGUMENT_EXCEPTION));
     }
 
     @Test
-    public void assertStringContains_allStringsFound_suceeds()
+    void assertException_invalidMessage_fails()
+    {
+        assertThrows(AssertionError.class,
+                () -> TestUtils.assertException(IllegalArgumentException.class, "message2",
+                        ILLEGAL_ARGUMENT_EXCEPTION));
+    }
+
+    @Test
+    void assertException_invalidCause_fails()
+    {
+        assertThrows(AssertionError.class,
+                () -> TestUtils.assertException(IllegalArgumentException.class, MESSAGE1,
+                        IllegalStateException.class, ILLEGAL_ARGUMENT_EXCEPTION));
+    }
+
+    @Test
+    void assertStringContains_allStringsFound_suceeds()
     {
         TestUtils.assertStringContains(THE_QUICK_BROWN_FOX, ANIMALS);
     }
 
-    @Test(expected = AssertionError.class)
-    public void assertStringContains_oneStringNotFound_fails()
+    @Test
+    void assertStringContains_oneStringNotFound_fails()
     {
-        TestUtils.assertStringContains(THE_QUICK_BROWN_FOX, "fox", "cat");
+        assertThrows(AssertionError.class,
+                () -> TestUtils.assertStringContains(THE_QUICK_BROWN_FOX, "fox", "cat"));
     }
 
     @Test
-    public void assertStringDoesNotContain_noStringsFound_suceeds()
+    void assertStringDoesNotContain_noStringsFound_suceeds()
     {
         TestUtils.assertStringDoesNotContain(THE_QUICK_BROWN_FOX, "sphinx", "quartz");
     }
 
-    @Test(expected = AssertionError.class)
-    public void assertStringDoesNotContain_oneStringFound_fails()
+    @Test
+    void assertStringDoesNotContain_oneStringFound_fails()
     {
-        TestUtils.assertStringDoesNotContain(THE_QUICK_BROWN_FOX, "sphinx", "brown");
+        assertThrows(AssertionError.class,
+                () -> TestUtils.assertStringDoesNotContain(THE_QUICK_BROWN_FOX, "sphinx", "brown"));
     }
 
     @Test
-    public void assertPositiveNumber_positiveNumber_success()
+    void assertPositiveNumber_positiveNumber_success()
     {
         TestUtils.assertPositiveNumber(999);
     }
 
-    @Test(expected = AssertionError.class)
-    public void assertPositiveNumber_negativeNumber_success()
+    @Test
+    void assertPositiveNumber_negativeNumber_success()
     {
-        TestUtils.assertPositiveNumber(-999);
+        assertThrows(AssertionError.class, () -> TestUtils.assertPositiveNumber(-999));
     }
 
     @Test
-    public void assertNegativeNumber_negativeNumber_success()
+    void assertNegativeNumber_negativeNumber_success()
     {
         TestUtils.assertNegativeNumber(-999);
     }
 
-    @Test(expected = AssertionError.class)
-    public void assertNegativeNumber_positiveNumber_success()
+    @Test
+    void assertNegativeNumber_positiveNumber_success()
     {
-        TestUtils.assertNegativeNumber(999);
+        assertThrows(AssertionError.class, () -> TestUtils.assertNegativeNumber(999));
     }
 
 }

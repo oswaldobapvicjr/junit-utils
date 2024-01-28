@@ -225,7 +225,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
                 boolean matcherResult = parent.causeMatcher.matches(causeThrowingProcedure);
                 if (!matcherResult)
                 {
-                    mismatch.appendText(NEW_LINE_INDENT).appendText("the cause did not match: (");
+                    mismatch.appendText(NEW_LINE_INDENT).appendText("the cause did not match: {");
                     parent.causeMatcher.describeMismatch(causeThrowingProcedure, mismatch);
                     mismatch.appendText(NEW_LINE_INDENT).appendText("}");
                 }
@@ -305,7 +305,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * @return the matcher
      * @since 1.3.1
      */
-    @Factory
     public static ExceptionMatcher throwsException()
     {
         return new ExceptionMatcher(Exception.class);
@@ -345,7 +344,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * @return the matcher
      * @since 1.1.0
      */
-    @Factory
     public static ExceptionMatcher throwsException(Class<? extends Exception> exception)
     {
         return new ExceptionMatcher(exception);
@@ -374,7 +372,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * @since 1.6.0
      * @see ExceptionMatcher#throwsException(Class)
      */
-    @Factory
     public static ExceptionMatcher exception(Class<? extends Exception> exception)
     {
         return new ExceptionMatcher(exception);
@@ -402,7 +399,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * @return the matcher
      * @since 1.3.1
      */
-    @Factory
     public static Matcher<Procedure> throwsNoException()
     {
         return new ExceptionMatcher(null);
