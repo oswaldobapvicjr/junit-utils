@@ -17,7 +17,6 @@
 package net.obvj.junit.utils.matchers;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
@@ -44,7 +43,6 @@ public class IsNegativeMatcher extends TypeSafeMatcher<Number>
      *
      * @return the matcher
      */
-    @Factory
     public static IsNegativeMatcher isNegative()
     {
         return new IsNegativeMatcher();

@@ -60,7 +60,6 @@ public class InstantiationNotAllowedMatcher extends TypeSafeDiagnosingMatcher<Cl
      *
      * @return the matcher
      */
-    @Factory
     public static InstantiationNotAllowedMatcher instantiationNotAllowed()
     {
         return new InstantiationNotAllowedMatcher();

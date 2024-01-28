@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 /**
@@ -195,7 +194,6 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
      * @param substrings the substrings to be tested
      * @return the matcher
      */
-    @Factory
     public static StringMatcher containsAll(String... substrings)
     {
         return new StringMatcher(Strategy.ALL, CaseStrategy.DEFAULT, substrings);
@@ -214,7 +212,6 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
      * @param substrings the substrings to be tested
      * @return the matcher
      */
-    @Factory
     public static StringMatcher containsAny(String... substrings)
     {
         return new StringMatcher(Strategy.ANY, CaseStrategy.DEFAULT, substrings);
@@ -233,7 +230,6 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
      * @param substrings the substrings to be tested
      * @return the matcher
      */
-    @Factory
     public static StringMatcher containsNone(String... substrings)
     {
         return new StringMatcher(Strategy.NONE, CaseStrategy.DEFAULT, substrings);

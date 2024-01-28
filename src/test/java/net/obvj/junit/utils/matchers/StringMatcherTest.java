@@ -20,8 +20,9 @@ import static net.obvj.junit.utils.matchers.StringMatcher.containsAll;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsNone;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the {@link StringMatcher} class.
@@ -29,7 +30,7 @@ import org.junit.Test;
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
  */
-public class StringMatcherTest
+class StringMatcherTest
 {
     private static final String THE_QUICK_BROWN_FOX = "The quick brown fox jumps over the lazy dog";
     private static final String DOG = "dog";
@@ -39,58 +40,62 @@ public class StringMatcherTest
     private static final String LAZY_UPPER = "LAZY";
 
     @Test
-    public void containsAll_allSubstringsFound_suceeds()
+    void containsAll_allSubstringsFound_suceeds()
     {
         assertThat(THE_QUICK_BROWN_FOX, containsAll(DOG, FOX));
     }
 
-    @Test(expected = AssertionError.class)
-    public void containsAll_unexpectedSubstring_fails()
+    @Test
+    void containsAll_unexpectedSubstring_fails()
     {
-        assertThat(THE_QUICK_BROWN_FOX, containsAll(DRAGON));
-    }
-
-    @Test(expected = AssertionError.class)
-    public void containsAll_nullSource_suceeds()
-    {
-        assertThat(null, containsAll(DOG));
+        assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, containsAll(DRAGON)));
     }
 
     @Test
-    public void containsAny_oneSubstringsFound_suceeds()
+    void containsAll_nullSource_suceeds()
+    {
+        assertThrows(AssertionError.class, () -> assertThat(null, containsAll(DOG)));
+    }
+
+    @Test
+    void containsAny_oneSubstringsFound_suceeds()
     {
         assertThat(THE_QUICK_BROWN_FOX, containsAny(DRAGON, FOX));
     }
 
-    @Test(expected = AssertionError.class)
-    public void containsAny_noneOfSubstringsFound_fails()
+    @Test
+    void containsAny_noneOfSubstringsFound_fails()
     {
-        assertThat(THE_QUICK_BROWN_FOX, containsAny(DRAGON));
+        assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, containsAny(DRAGON)));
     }
 
     @Test
-    public void containsNone_noSubstringFound_suceeds()
+    void containsNone_noSubstringFound_suceeds()
     {
         assertThat(THE_QUICK_BROWN_FOX, containsNone(DRAGON, MANTICORE));
     }
 
-    @Test(expected = AssertionError.class)
-    public void containsNone_unexpectedString_fails()
+    @Test
+    void containsNone_unexpectedString_fails()
     {
-        assertThat(THE_QUICK_BROWN_FOX, containsNone(DRAGON, MANTICORE, DOG));
+        assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, containsNone(DRAGON, MANTICORE, DOG)));
     }
 
     @Test
-    public void ignoreCase_substringMatches_success()
+    void ignoreCase_substringMatches_success()
     {
         assertThat(THE_QUICK_BROWN_FOX, containsAll(LAZY_UPPER).ignoreCase());
         assertThat(THE_QUICK_BROWN_FOX, containsAny(LAZY_UPPER).ignoreCase());
     }
 
-    @Test(expected = AssertionError.class)
-    public void ignoreCase_substringNotMatches_fails()
+    @Test
+    void ignoreCase_substringNotMatches_fails()
     {
-        assertThat(THE_QUICK_BROWN_FOX, containsAll(DRAGON).ignoreCase());
+        assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, containsAll(DRAGON).ignoreCase()));
     }
 
 }

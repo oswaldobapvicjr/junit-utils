@@ -18,9 +18,10 @@ package net.obvj.junit.utils.matchers;
 
 import static net.obvj.junit.utils.matchers.InstantiationNotAllowedMatcher.instantiationNotAllowed;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.hamcrest.CoreMatchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import net.obvj.junit.utils.TestUtils;
 
@@ -30,67 +31,82 @@ import net.obvj.junit.utils.TestUtils;
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
  */
-public class InstantiationNotAllowedMatcherTest
+class InstantiationNotAllowedMatcherTest
 {
 
+    public static class MyClassPrivateConstructorOnly
+    {
+
+        private MyClassPrivateConstructorOnly()
+        {
+            // Do nothing
+        }
+    }
+
     @Test
-    public void instantiationNotAllowed_classWithPrivateConstructorAndThrowingException()
+    void instantiationNotAllowed_classWithPrivateConstructorAndThrowingException()
     {
         assertThat(TestUtils.class, instantiationNotAllowed());
     }
 
-    @Test(expected = AssertionError.class)
-    public void instantiationNotAllowed_classWithPublicConstructor()
+    @Test
+    void instantiationNotAllowed_classWithPublicConstructor()
     {
-        assertThat(String.class, instantiationNotAllowed());
-    }
-
-    @Test(expected = AssertionError.class)
-    public void instantiationNotAllowed_classWithPrivateConstructorButInstantiationAllowed()
-    {
-        assertThat(Runtime.class, instantiationNotAllowed());
+        assertThrows(AssertionError.class,
+                () -> assertThat(String.class, instantiationNotAllowed()));
     }
 
     @Test
-    public void instantiationNotAllowed_throwingCorrectException_success()
+    void instantiationNotAllowed_classWithPrivateConstructorButInstantiationAllowed()
+    {
+        assertThrows(AssertionError.class,
+                () -> assertThat(MyClassPrivateConstructorOnly.class, instantiationNotAllowed()));
+    }
+
+    @Test
+    void instantiationNotAllowed_throwingCorrectException_success()
     {
         assertThat(TestUtils.class, instantiationNotAllowed().throwing(UnsupportedOperationException.class));
     }
 
-    @Test(expected = AssertionError.class)
-    public void instantiationNotAllowed_throwingNotSameException_failure()
+    @Test
+    void instantiationNotAllowed_throwingNotSameException_failure()
     {
-        assertThat(TestUtils.class, instantiationNotAllowed().throwing(IllegalArgumentException.class));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void instantiationNotAllowed_throwingNull_failure()
-    {
-        assertThat(TestUtils.class, instantiationNotAllowed().throwing(null));
+        assertThrows(AssertionError.class, () -> assertThat(TestUtils.class,
+                instantiationNotAllowed().throwing(IllegalArgumentException.class)));
     }
 
     @Test
-    public void instantiationNotAllowed_throwingSameExceptionAndMessage_success()
+    void instantiationNotAllowed_throwingNull_failure()
+    {
+        assertThrows(NullPointerException.class,
+                () -> assertThat(TestUtils.class, instantiationNotAllowed().throwing(null)));
+    }
+
+    @Test
+    void instantiationNotAllowed_throwingSameExceptionAndMessage_success()
     {
         assertThat(TestUtils.class,
                 instantiationNotAllowed().throwing(UnsupportedOperationException.class).withMessage("Utility class"));
     }
 
-    @Test(expected = AssertionError.class)
-    public void instantiationNotAllowed_throwingSameExceptionButNotSameMessage_failure()
+    @Test
+    void instantiationNotAllowed_throwingSameExceptionButNotSameMessage_failure()
     {
-        assertThat(TestUtils.class,
-                instantiationNotAllowed().throwing(UnsupportedOperationException.class).withMessage("invalid message"));
+        assertThrows(AssertionError.class,
+                () -> assertThat(TestUtils.class,
+                        instantiationNotAllowed().throwing(UnsupportedOperationException.class)
+                                .withMessage("invalid message")));
     }
 
     @Test
-    public void instantiationNotAllowed_withMessageOnlyAndSameMessage_success()
+    void instantiationNotAllowed_withMessageOnlyAndSameMessage_success()
     {
         assertThat(TestUtils.class, instantiationNotAllowed().withMessage("Utility class"));
     }
 
     @Test
-    public void instantiationNotAllowed_withMessageMatcherAndMessageMatches_success()
+    void instantiationNotAllowed_withMessageMatcherAndMessageMatches_success()
     {
         assertThat(TestUtils.class, instantiationNotAllowed().withMessage(CoreMatchers.startsWith("Utility")));
     }
