@@ -1,6 +1,46 @@
 =============================================================================
 
                                  junit-utils
+                                version 1.7.0
+                                   2024-02
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+New features/enhancements:
+
+  > issue/0030: Upgrade to JUnit 5
+  > issue/0031: Upgrade CI/CD setup
+
+ 
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
+                                version 1.6.0
+                                   2024-01
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+New features/enhancements:
+
+  > issue/0028: Nested ExceptionMatcher for enhanced cause validation
+  > issue/0029: Add support to JDK 21 LTS
+
+ 
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
                                 version 1.5.0
                                    2023-06
 
