@@ -16,11 +16,17 @@
 
 package net.obvj.junit.utils.matchers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
-import org.hamcrest.*;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import net.obvj.junit.utils.Procedure;
 
@@ -272,6 +278,20 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     private MessageMatchingStrategy messageMatchingStrategy;
     private List<String> expectedMessageSubstrings = Collections.emptyList();
     private Matcher<String> messageMatcher;
+
+    private List<CustomFunction> customFunctions;
+
+    private static class CustomFunction
+    {
+        private final Function<? super Throwable, Object> function;
+        private final Matcher<?> matcher;
+
+        private CustomFunction(Function<? super Throwable, Object> function, Matcher<?> matcher)
+        {
+            this.function = function;
+            this.matcher = matcher;
+        }
+    }
 
     /**
      * Builds this Matcher.
@@ -584,6 +604,19 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     }
 
     /**
+     * @since 1.8.0
+     */
+    public <T> ExceptionMatcher with(Function<? super T, Object> function, Matcher<?> matcher)
+    {
+        if (customFunctions == null)
+        {
+            customFunctions = new ArrayList<>();
+        }
+        customFunctions.add(new CustomFunction((Function<? super Throwable, Object>) function, matcher));
+        return this;
+    }
+
+    /**
      * Execute the matcher business logic for the specified procedure.
      *
      * @param procedure a procedure supposed to produce an exception to be evaluated
@@ -622,7 +655,11 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         {
             return false;
         }
-        return !(checkCauseFlag && !validateCause(throwable, mismatch));
+        if (checkCauseFlag && !validateCause(throwable, mismatch))
+        {
+            return false;
+        }
+        return validateCustomFunctions(throwable, mismatch);
     }
 
     /**
@@ -667,6 +704,27 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         return causeMatchingStrategy.validateCause(this, throwable, mismatch);
     }
 
+
+    private boolean validateCustomFunctions(Throwable throwable, Description mismatch)
+    {
+        if (customFunctions != null)
+        {
+            for (int i = 0; i < customFunctions.size(); i++)
+            {
+                CustomFunction customFunction = customFunctions.get(i);
+                Object actual = customFunction.function.apply(throwable);
+                if (!customFunction.matcher.matches(actual))
+                {
+                    mismatch.appendText(NEW_LINE_INDENT)
+                            .appendText("the value retrieved by the function #" + (i + 1) + " ");
+                    customFunction.matcher.describeMismatch(actual, mismatch);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Describes the "expected" pat of the test description.
      *
@@ -683,6 +741,15 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         if (checkCauseFlag)
         {
             causeMatchingStrategy.describeTo(this, description);
+        }
+        if (customFunctions != null)
+        {
+            IntStream.range(0, customFunctions.size()).forEach((int i) ->
+            {
+                description.appendText(NEW_LINE_INDENT)
+                           .appendText("and the function #" + (i + 1) + ": ");
+                customFunctions.get(i).matcher.describeTo(description);
+            });
         }
     }
 

@@ -21,7 +21,7 @@ import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsException;
 import static net.obvj.junit.utils.matchers.ExceptionMatcher.throwsNoException;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
 import static org.hamcrest.CoreMatchers.either;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -718,4 +718,119 @@ class ExceptionMatcherTest
         },
         throwsException(IOException.class).withCause(FileNotFoundException.class));
     }
+
+    @Test
+    void with_validFunctionAndMatcherMatching_success()
+    {
+        assertThat(() ->
+        {
+            throw new MyCustomException(MESSAGE1, ERR_0001, 1910);
+        },
+        throwsException(MyCustomException.class)
+                .with(MyCustomException::getCustomString, equalTo(ERR_0001)));
+    }
+
+    @Test
+    void with_validFunctionAndMatcherNotMatching_exception()
+    {
+        try
+        {
+            assertThat(() ->
+            {
+                throw new MyCustomException(MESSAGE1, ERR_0001, 1910);
+            },
+            throwsException(MyCustomException.class)
+                    .with(MyCustomException::getCustomString, startsWith("ERR-0002")));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo(MyCustomException.class.getCanonicalName()));
+            assertThat(lines[3].trim(), equalTo("and the function #1: a string starting with \"ERR-0002\""));
+            assertThat(lines[4].trim(), equalTo("but:"));
+            assertThat(lines[5].trim(), equalTo("the value retrieved by the function #1 was \"ERR-0001\""));
+        }
+    }
+
+    @Test
+    void with_multipleValidFunctionsAndMatchersMatching_success()
+    {
+        assertThat(() ->
+        {
+            throw new MyCustomException(MESSAGE1, ERR_0001, 1910);
+        },
+        throwsException(MyCustomException.class)
+                .with(MyCustomException::getCustomString, equalTo(ERR_0001))
+                .with(MyCustomException::getCode, equalTo(1910))
+                .with(MyCustomException::getLocalizedMessage, equalTo(MESSAGE1)));
+    }
+
+    @Test
+    void with_multipleValidFunctionsAndOneMatcherNotMatching_exception()
+    {
+        try
+        {
+            assertThat(() ->
+            {
+                throw new MyCustomException(MESSAGE1, ERR_0001, 1910);
+            },
+            throwsException(MyCustomException.class)
+                    .with(MyCustomException::getCustomString, equalTo(ERR_0001))
+                    .with(MyCustomException::getCode, equalTo(1910))
+                    .with(MyCustomException::getLocalizedMessage, endsWith(MESSAGE2)));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo(MyCustomException.class.getCanonicalName()));
+            assertThat(lines[3].trim(), equalTo("and the function #1: \"ERR-0001\""));
+            assertThat(lines[4].trim(), equalTo("and the function #2: <1910>"));
+            assertThat(lines[5].trim(), equalTo("and the function #3: a string ending with \"message2\""));
+            assertThat(lines[6].trim(), equalTo("but:"));
+            assertThat(lines[7].trim(), equalTo("the value retrieved by the function #3 was \"message1\""));
+        }
+    }
+
+    @Test
+    void with_mixedMessageContainingAndValidFunctionsAndAllMatching_success()
+    {
+        assertThat(() ->
+        {
+            throw new MyCustomException(MESSAGE2, ERR_0001, 1911);
+        },
+        throwsException(MyCustomException.class)
+                .withMessageContaining(MESSAGE2)
+                .with(MyCustomException::getCustomString, equalTo(ERR_0001))
+                .with(MyCustomException::getCode, equalTo(1911)));
+    }
+
+    @Test
+    void with_mixedMessageContainingAndValidFunctionsAndOneMatcherNotMatching_exception()
+    {
+        try
+        {
+            assertThat(() ->
+            {
+                throw new MyCustomException(MESSAGE2, ERR_0001, 1910);
+            },
+            throwsException(MyCustomException.class)
+                    .withMessageContaining(MESSAGE2)
+                    .with(MyCustomException::getCustomString, equalTo(ERR_0001))
+                    .with(MyCustomException::getCode, equalTo(1911)));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo(MyCustomException.class.getCanonicalName()));
+            assertThat(lines[3].trim(), equalTo("with message containing: [message2]"));
+            assertThat(lines[4].trim(), equalTo("and the function #1: \"ERR-0001\""));
+            assertThat(lines[5].trim(), equalTo("and the function #2: <1911>"));
+            assertThat(lines[6].trim(), equalTo("but:"));
+            assertThat(lines[7].trim(), equalTo("the value retrieved by the function #2 was <1910>"));
+        }
+    }
+
 }
