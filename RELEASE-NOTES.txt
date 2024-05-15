@@ -1,6 +1,30 @@
 =============================================================================
 
                                  junit-utils
+                                version 1.8.0
+                                   2024-05
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+New features/enhancements:
+
+  > issue/0033: New ExceptionMatcher.with(Function, Matcher) to extract and
+                validate custom values
+
+Minor enhancements:
+
+  > issue/0032: Upgrade org.junit.jupiter:junit-jupiter-api to 5.10.2
+
+
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
                                 version 1.7.0
                                    2024-02
 
