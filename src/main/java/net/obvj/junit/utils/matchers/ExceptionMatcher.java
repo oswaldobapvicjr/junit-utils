@@ -16,11 +16,17 @@
 
 package net.obvj.junit.utils.matchers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
-import org.hamcrest.*;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import net.obvj.junit.utils.Procedure;
 
@@ -257,6 +263,25 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         abstract void describeTo(ExceptionMatcher parent, Description description);
     }
 
+    /**
+     * A simple association between a function and a matcher, to extract and validate custom data
+     * from a throwable.
+     *
+     * @since 1.8.0
+     */
+    private static class CustomFunction
+    {
+        private final Function<? super Throwable, Object> function;
+        private final Matcher<?> matcher;
+
+        private CustomFunction(Function<? super Throwable, Object> function, Matcher<?> matcher)
+        {
+            this.function = function;
+            this.matcher = matcher;
+        }
+    }
+
+
     private static final String INDENT = "          ";
     private static final String NEW_LINE_INDENT = "\n" + INDENT;
 
@@ -272,6 +297,9 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     private MessageMatchingStrategy messageMatchingStrategy;
     private List<String> expectedMessageSubstrings = Collections.emptyList();
     private Matcher<String> messageMatcher;
+
+    private List<CustomFunction> customFunctions;
+
 
     /**
      * Builds this Matcher.
@@ -588,6 +616,41 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     }
 
     /**
+     * Uses the given function to extract a value from the expected throwable, and a matcher to be
+     * used against the function's result.
+     * <p>
+     * This can be particularly useful to extract custom exception data using a method
+     * reference or a lambda expression.
+     * <p>
+     * For example:
+     *
+     * <blockquote>
+     * <pre>
+     * {@code
+     * assertThat(() -> obj.doStuff(null),
+     *         throwsException(MyCustomException.class)
+     *             .with(MyCustomException::getErrorCode, equalTo(12001))
+     *             .with(MyCustomException::getLocalizedMessage, equalTo("Invalid parameter")));}
+     * </pre>
+     * </blockquote>
+     *
+     * @param <T>      the expected throwable type
+     * @param function a function to be applied to extract the value from the throwable
+     * @param matcher  the matcher to be used against the function result
+     * @return the matcher, incremented with the specified custom function and matcher
+     * @since 1.8.0
+     */
+    public <T> ExceptionMatcher with(Function<? super T, Object> function, Matcher<?> matcher)
+    {
+        if (customFunctions == null)
+        {
+            customFunctions = new ArrayList<>();
+        }
+        customFunctions.add(new CustomFunction((Function<? super Throwable, Object>) function, matcher));
+        return this;
+    }
+
+    /**
      * Execute the matcher business logic for the specified procedure.
      *
      * @param procedure a procedure supposed to produce an exception to be evaluated
@@ -626,7 +689,11 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         {
             return false;
         }
-        return !(checkCauseFlag && !validateCause(throwable, mismatch));
+        if (checkCauseFlag && !validateCause(throwable, mismatch))
+        {
+            return false;
+        }
+        return validateCustomFunctions(throwable, mismatch);
     }
 
     /**
@@ -671,6 +738,35 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         return causeMatchingStrategy.validateCause(this, throwable, mismatch);
     }
 
+
+    /**
+     * Validates the custom functions, if present.
+     *
+     * @param throwable the Throwable whose cause is to be validated
+     * @param mismatch  the description to be used for reporting in case of mismatch
+     * @return a flag indicating whether or not the matching has succeeded
+     * @since 1.8.0
+     */
+    private boolean validateCustomFunctions(Throwable throwable, Description mismatch)
+    {
+        if (customFunctions != null)
+        {
+            for (int i = 0; i < customFunctions.size(); i++)
+            {
+                CustomFunction custom = customFunctions.get(i);
+                Object actual = custom.function.apply(throwable);
+                if (!custom.matcher.matches(actual))
+                {
+                    mismatch.appendText(NEW_LINE_INDENT)
+                            .appendText("the value retrieved by the function #" + (i + 1) + " ");
+                    custom.matcher.describeMismatch(actual, mismatch);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Describes the "expected" pat of the test description.
      *
@@ -687,6 +783,15 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         if (checkCauseFlag)
         {
             causeMatchingStrategy.describeTo(this, description);
+        }
+        if (customFunctions != null)
+        {
+            IntStream.range(0, customFunctions.size()).forEach((int i) ->
+            {
+                description.appendText(NEW_LINE_INDENT)
+                           .appendText("and the function #" + (i + 1) + ": ");
+                customFunctions.get(i).matcher.describeTo(description);
+            });
         }
     }
 
