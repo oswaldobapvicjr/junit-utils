@@ -263,6 +263,25 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         abstract void describeTo(ExceptionMatcher parent, Description description);
     }
 
+    /**
+     * A simple association between a function and a matcher, to extract and validate custom data
+     * from a throwable.
+     *
+     * @since 1.8.0
+     */
+    private static class CustomFunction
+    {
+        private final Function<? super Throwable, Object> function;
+        private final Matcher<?> matcher;
+
+        private CustomFunction(Function<? super Throwable, Object> function, Matcher<?> matcher)
+        {
+            this.function = function;
+            this.matcher = matcher;
+        }
+    }
+
+
     private static final String INDENT = "          ";
     private static final String NEW_LINE_INDENT = "\n" + INDENT;
 
@@ -281,17 +300,6 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
 
     private List<CustomFunction> customFunctions;
 
-    private static class CustomFunction
-    {
-        private final Function<? super Throwable, Object> function;
-        private final Matcher<?> matcher;
-
-        private CustomFunction(Function<? super Throwable, Object> function, Matcher<?> matcher)
-        {
-            this.function = function;
-            this.matcher = matcher;
-        }
-    }
 
     /**
      * Builds this Matcher.
