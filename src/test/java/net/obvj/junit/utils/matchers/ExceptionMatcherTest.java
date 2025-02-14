@@ -64,6 +64,11 @@ public class ExceptionMatcherTest
         throw new IllegalArgumentException();
     };
 
+    private static String[] extractMessageLines(Throwable t)
+    {
+        return t.getMessage().split("\\R");
+    }
+
     // ================================
     // Test methods - start
     // ================================
@@ -400,7 +405,7 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    void with_validFunctionAndMatcherMatching_success()
+    public void with_validFunctionAndMatcherMatching_success()
     {
         assertThat(() ->
         {
@@ -411,7 +416,7 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    void with_validFunctionAndMatcherNotMatching_exception()
+    public void with_validFunctionAndMatcherNotMatching_exception()
     {
         try
         {
@@ -434,7 +439,7 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    void with_multipleValidFunctionsAndMatchersMatching_success()
+    public void with_multipleValidFunctionsAndMatchersMatching_success()
     {
         assertThat(() ->
         {
@@ -447,7 +452,7 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    void with_multipleValidFunctionsAndOneMatcherNotMatching_exception()
+    public void with_multipleValidFunctionsAndOneMatcherNotMatching_exception()
     {
         try
         {
@@ -474,7 +479,7 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    void with_mixedMessageContainingAndValidFunctionsAndAllMatching_success()
+    public void with_mixedMessageContainingAndValidFunctionsAndAllMatching_success()
     {
         assertThat(() ->
         {
@@ -487,7 +492,7 @@ public class ExceptionMatcherTest
     }
 
     @Test
-    void with_mixedMessageContainingAndValidFunctionsAndOneMatcherNotMatching_exception()
+    public void with_mixedMessageContainingAndValidFunctionsAndOneMatcherNotMatching_exception()
     {
         try
         {
