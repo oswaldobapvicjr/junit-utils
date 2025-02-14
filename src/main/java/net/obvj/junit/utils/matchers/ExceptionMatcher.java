@@ -23,10 +23,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
+import org.hamcrest.*;
 
 import net.obvj.junit.utils.Procedure;
 
@@ -638,7 +635,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * @param function a function to be applied to extract the value from the throwable
      * @param matcher  the matcher to be used against the function result
      * @return the matcher, incremented with the specified custom function and matcher
-     * @since 1.8.0
+     * @since 1.6.1
      */
     public <T> ExceptionMatcher with(Function<? super T, Object> function, Matcher<?> matcher)
     {
