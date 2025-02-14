@@ -635,7 +635,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
      * @param function a function to be applied to extract the value from the throwable
      * @param matcher  the matcher to be used against the function result
      * @return the matcher, incremented with the specified custom function and matcher
-     * @since 1.8.0
+     * @since 1.6.1
      */
     public <T> ExceptionMatcher with(Function<? super T, Object> function, Matcher<?> matcher)
     {
