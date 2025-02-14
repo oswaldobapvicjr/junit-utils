@@ -8,7 +8,7 @@
 
 -----------------------------------------------------------------------------
 
-New features/enhancements:
+New features/enhancements/fixed bugs:
 
   > issue/0039: New ExceptionMatcher.with(Function, Matcher) to extract and
                 validate custom values (cherry-picked from issue/0033)
