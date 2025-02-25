@@ -119,6 +119,14 @@ class AdvancedMatchersTest
     }
 
     @Test
+    void containsAllInSequence_moreThanOneString_createStringMatcherAccordingly()
+    {
+        StringMatcher matcher = containsAllInSequence(STRING1, STRING2);
+        assertThat(matcher.getStrategy(), is(equalTo(Strategy.ALL_IN_SEQUENCE)));
+        assertThat(matcher.getSubstrings(), is(equalTo(Arrays.asList(STRING1, STRING2))));
+    }
+
+    @Test
     void containsAny_moreThanOneString_createStringMatcherAccordingly()
     {
         StringMatcher matcher = containsAny(STRING1, STRING2);

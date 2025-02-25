@@ -16,8 +16,10 @@
 
 package net.obvj.junit.utils.matchers;
 
-import static net.obvj.junit.utils.matchers.StringMatcher.*;
-import static org.hamcrest.CoreMatchers.*;
+import static net.obvj.junit.utils.matchers.StringMatcher.containsAll;
+import static net.obvj.junit.utils.matchers.StringMatcher.containsAllInSequence;
+import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
+import static net.obvj.junit.utils.matchers.StringMatcher.containsNone;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -110,8 +112,10 @@ class StringMatcherTest
     @Test
     void containsAllInSequence_oneSubstringOnlyAndNotFound_fails()
     {
-        AssertionError error = assertThrows(AssertionError.class,  () -> assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(DRAGON)));
-        assertLines(error.getMessage(), "", "Expected: a string containing ALL (in sequence) of the specified substrings [dragon]",
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(DRAGON)));
+        assertLines(error.getMessage(), "",
+                "Expected: a string containing ALL (in sequence) of the specified substrings [dragon]",
                 "     but: the substring \"dragon\" was not found in: \"" + THE_QUICK_BROWN_FOX + "\"");
     }
 
@@ -128,10 +132,18 @@ class StringMatcherTest
     }
 
     @Test
+    void containsAllInSequence_twoSubstringsAndBothFoundInSequenceAndIgnoreCase_success()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence("QUICK", "BROWN").ignoreCase());
+    }
+
+    @Test
     void containsAllInSequence_secondSubstringNotInSequence_fails()
     {
-        AssertionError error = assertThrows(AssertionError.class,  () -> assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(DOG, FOX)));
-        assertLines(error.getMessage(), "", "Expected: a string containing ALL (in sequence) of the specified substrings [dog, fox]",
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(DOG, FOX)));
+        assertLines(error.getMessage(), "",
+                "Expected: a string containing ALL (in sequence) of the specified substrings [dog, fox]",
                 "     but: the substring \"fox\" was not found after \"dog\" in: \"" + THE_QUICK_BROWN_FOX + "\"");
     }
 

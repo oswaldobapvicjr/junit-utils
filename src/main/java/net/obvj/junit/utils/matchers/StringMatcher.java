@@ -64,7 +64,9 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
         },
 
         /**
-         * Matches if all of the specified substrings are found in the tested string in the sequence they are declared.
+         * Matches if all of the specified substrings are found in the tested string in the
+         * sequence they are declared.
+         *
          * @since 1.9.0
          */
         ALL_IN_SEQUENCE
@@ -215,8 +217,18 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
          */
         public abstract boolean contains(String string, String substring);
 
-
-        public abstract int indexOf(String string, String substring, int startIndex);
+        /**
+         * Returns the index of the first occurrence of the specified substring within the
+         * specified string, starting at the specified index.
+         *
+         * @param string    the string to check
+         * @param substring the substring to search for
+         * @param fromIndex the index from which to start the search
+         * @return the index the index of the first occurrence of the specified substring within
+         *         the specified string, starting at the specified index
+         * @since 1.9.0
+         */
+        public abstract int indexOf(String string, String substring, int fromIndex);
     }
 
     private final Strategy strategy;
