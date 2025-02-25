@@ -33,6 +33,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
 {
     private static final String EXPECTED_SCENARIO = "a string containing %s of the specified substrings %s";
     private static final String EXPECTED_STRING_NOT_FOUND = "the substring \"%s\" was not found in: \"%s\"";
+    private static final String EXPECTED_STRING_NOT_FOUND_AFTER = "the substring \"%s\" was not found after \"%s\" in: \"%s\"";
     private static final String NONE_OF_THE_STRINGS_FOUND = "none of the specified substrings was found in: \"%s\"";
     private static final String UNEXPECTED_STRING_FOUND = "the unexpected string \"%s\" was found in: \"%s\"";
 
@@ -59,6 +60,49 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
                     }
                 }
                 return true;
+            }
+        },
+
+        /**
+         * Matches if all of the specified substrings are found in the tested string in the
+         * sequence they are declared.
+         *
+         * @since 1.9.0
+         */
+        ALL_IN_SEQUENCE
+        {
+            @Override
+            public boolean evaluate(String string, List<String> substrings, CaseStrategy caseStrategy,
+                    Description mismatch)
+            {
+                int lastIndex = -1;
+                for (int i = 0; i < substrings.size(); i++)
+                {
+                    String substring = substrings.get(i);
+                    int currentIndex = caseStrategy.indexOf(string,  substring, lastIndex + 1);
+
+                    if (currentIndex == -1)
+                    {
+                        if (i == 0)
+                        {
+                            mismatch.appendText(String.format(EXPECTED_STRING_NOT_FOUND, substring, string));
+                        }
+                        else
+                        {
+                            mismatch.appendText(String.format(EXPECTED_STRING_NOT_FOUND_AFTER, substring, substrings.get(i - 1), string));
+                        }
+                        return false;
+                    }
+
+                    lastIndex = currentIndex + substring.length() - 1;
+                }
+                return true;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "ALL (in sequence)";
             }
         },
 
@@ -131,6 +175,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
             {
                 return string != null && substring != null && string.contains(substring);
             }
+
+            @Override
+            public int indexOf(String string, String substring, int fromIndex)
+            {
+                return string != null ? string.indexOf(substring, fromIndex): -1;
+            }
         },
 
         /**
@@ -142,6 +192,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
             public boolean contains(String string, String substring)
             {
                 return string != null && substring != null && string.toLowerCase().contains(substring.toLowerCase());
+            }
+
+            @Override
+            public int indexOf(String string, String substring, int fromIndex)
+            {
+                return string != null && substring != null ? string.toLowerCase().indexOf(substring.toLowerCase(), fromIndex): -1;
             }
         };
 
@@ -160,6 +216,19 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
          * @return {@code true} if the string contains the substring, otherwise {@code false}
          */
         public abstract boolean contains(String string, String substring);
+
+        /**
+         * Returns the index of the first occurrence of the specified substring within the
+         * specified string, starting at the specified index.
+         *
+         * @param string    the string to check
+         * @param substring the substring to search for
+         * @param fromIndex the index from which to start the search
+         * @return the index the index of the first occurrence of the specified substring within
+         *         the specified string, starting at the specified index
+         * @since 1.9.0
+         */
+        public abstract int indexOf(String string, String substring, int fromIndex);
     }
 
     private final Strategy strategy;
@@ -197,6 +266,26 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     public static StringMatcher containsAll(String... substrings)
     {
         return new StringMatcher(Strategy.ALL, CaseStrategy.DEFAULT, substrings);
+    }
+
+    /**
+     * Creates a matcher that matches if the examined string contains <b>all</b> of the
+     * specified substrings in order.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * assertThat("the quick brown fox", containsAllInSequence("quick", "brown")) //PASS
+     * assertThat("the quick brown fox", containsAllInSequence("brown", "quick")) //FAIL
+     * </pre>
+     *
+     * @param substrings the substrings to be tested
+     * @return the matcher
+     * @since 1.9.0
+     */
+    public static StringMatcher containsAllInSequence(String... substrings)
+    {
+        return new StringMatcher(Strategy.ALL_IN_SEQUENCE, CaseStrategy.DEFAULT, substrings);
     }
 
     /**
