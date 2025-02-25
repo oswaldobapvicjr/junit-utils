@@ -284,6 +284,39 @@ public class AdvancedMatchers
     }
 
     /**
+     * Creates a matcher that matches if the examined string contains <b>all</b> of the
+     * specified substrings in order.
+     * <p>
+     * For example:
+     *
+     * <blockquote>
+     * <pre>
+     * assertThat("the quick brown fox", containsAllInSequence("the", "fox")) //PASS
+     * assertThat("the quick brown fox", containsAllInSequence("fox", "the")) //FAIL
+     * </pre>
+     * </blockquote>
+     *
+     * By default, the matcher is <b>case-sensitive</b>, but this behavior can be modified
+     * with an additional method call.
+     * <p>
+     * For example:
+     *
+     * <blockquote>
+     * <pre>
+     * assertThat("the quick brown fox", containsAllInSequence("QUICK", "brown").ignoreCase())
+     * </pre>
+     * </blockquote>
+     *
+     * @param substrings the substrings to be tested
+     * @return the matcher
+     * @since 1.9.0
+     */
+    public static StringMatcher containsAllInSequence(String... substrings)
+    {
+        return StringMatcher.containsAllInSequence(substrings);
+    }
+
+    /**
      * Creates a matcher that matches if the examined string contains <b>any</b> of the
      * specified substrings.
      * <p>

@@ -16,11 +16,14 @@
 
 package net.obvj.junit.utils.matchers;
 
-import static net.obvj.junit.utils.matchers.StringMatcher.containsAll;
-import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
-import static net.obvj.junit.utils.matchers.StringMatcher.containsNone;
+import static net.obvj.junit.utils.matchers.StringMatcher.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -96,6 +99,47 @@ class StringMatcherTest
     {
         assertThrows(AssertionError.class,
                 () -> assertThat(THE_QUICK_BROWN_FOX, containsAll(DRAGON).ignoreCase()));
+    }
+
+    @Test
+    void containsAllInSequence_oneSubstringOnlyAndFound_success()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(FOX));
+    }
+
+    @Test
+    void containsAllInSequence_oneSubstringOnlyAndNotFound_fails()
+    {
+        AssertionError error = assertThrows(AssertionError.class,  () -> assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(DRAGON)));
+        assertLines(error.getMessage(), "", "Expected: a string containing ALL (in sequence) of the specified substrings [dragon]",
+                "     but: the substring \"dragon\" was not found in: \"" + THE_QUICK_BROWN_FOX + "\"");
+    }
+
+    @Test
+    void containsAllInSequence_twoSubstringsAndBothFoundInSequenceFar_success()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(FOX, DOG));
+    }
+
+    @Test
+    void containsAllInSequence_twoSubstringsAndBothFoundInSequenceClose_success()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence("lazy", " dog"));
+    }
+
+    @Test
+    void containsAllInSequence_secondSubstringNotInSequence_fails()
+    {
+        AssertionError error = assertThrows(AssertionError.class,  () -> assertThat(THE_QUICK_BROWN_FOX, containsAllInSequence(DOG, FOX)));
+        assertLines(error.getMessage(), "", "Expected: a string containing ALL (in sequence) of the specified substrings [dog, fox]",
+                "     but: the substring \"fox\" was not found after \"dog\" in: \"" + THE_QUICK_BROWN_FOX + "\"");
+    }
+
+    void assertLines(String actualString, String... expectedlines)
+    {
+        List<String> expectedLines = Arrays.asList(expectedlines);
+        List<String> actualStringAsList = Arrays.asList(actualString.split(System.getProperty("line.separator")));
+        assertLinesMatch(expectedLines, actualStringAsList);
     }
 
 }
