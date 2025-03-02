@@ -59,7 +59,7 @@ assertThat(() -> myObject.doStuff(null),
             .withCause(NullPointerException.class));
 ```
 
-And more:
+Including cause details:
 
 ```java
 assertThat(() -> myObject.doStuff(null),
@@ -69,6 +69,14 @@ assertThat(() -> myObject.doStuff(null),
                     .withMessage("stuff cannot be null")));
 ```
 
+And more:
+
+```java
+assertThat(() -> httpClient.post(request),
+        throwsException(HttpException.class)
+            .with(HttpException::getStatusCode, equalTo(400));
+```
+ 
 
 ### Testing that instantiation is not allowed
 
@@ -85,9 +93,10 @@ assertThat(TestUtils.class, instantiationNotAllowed());
 The following examples represent some successful assertions using the Advanced String matcher:
 
 ```java
-assertThat("The quick brown fox jumps over the lazy dog", containsAll("fox", "dog"));
+assertThat("The quick brown fox jumps over the lazy dog", containsAll("dog", "fox"));
 assertThat("The quick brown fox jumps over the lazy dog", containsAny("FOX", "dragon").ignoreCase());
 assertThat("The quick brown fox jumps over the lazy dog", containsNone("centaur"));
+assertThat("The quick brown fox jumps over the lazy dog", containsAllInSequence("fox", "dog"));
 ```
 
 ### Testing numbers
@@ -109,7 +118,7 @@ If you are using Maven, add **junit-utils** as a dependency in your pom.xml file
 <dependency>
     <groupId>net.obvj</groupId>
     <artifactId>junit-utils</artifactId>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 

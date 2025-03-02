@@ -1,6 +1,29 @@
 =============================================================================
 
                                  junit-utils
+                                version 1.9.0
+                                   2025-03
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+New features/enhancements:
+
+  > issue/0043: New StringMatcher.containsAllInSequence(String...)
+
+Minor enhancements:
+
+  > issue/0042: Upgrade org.junit.jupiter:junit-jupiter-api to 5.11.4
+
+
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
                                 version 1.8.0
                                    2024-05
 
@@ -36,6 +59,27 @@ New features/enhancements:
 
   > issue/0030: Upgrade to JUnit 5
   > issue/0031: Upgrade CI/CD setup
+
+ 
+For more information, or suggestions for improvement, visit:
+https://obvj.net/junit-utils
+
+
+=============================================================================
+
+                                 junit-utils
+                                version 1.6.1
+                                   2025-02
+
+                                RELEASE NOTES
+
+-----------------------------------------------------------------------------
+
+New features/enhancements/fixed bugs:
+
+  > issue/0039: New ExceptionMatcher.with(Function, Matcher) to extract and
+                validate custom values (cherry-picked from issue/0033)
+  > issue/0041: Adapt issue/0033 to JUnit 4
 
  
 For more information, or suggestions for improvement, visit:
