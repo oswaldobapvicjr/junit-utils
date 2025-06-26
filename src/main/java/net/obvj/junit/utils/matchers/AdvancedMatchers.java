@@ -140,6 +140,37 @@ public class AdvancedMatchers
     }
 
     /**
+     * Creates a matcher that matches if the examined procedure throws an expected exception
+     * instance. This is particularly useful for situations involving mocks, where the actual
+     * exception is already preset.
+     * <p>
+     * For example (using Mockito):
+     *
+     * <pre>
+     * {@code // Arrange
+     * Exception ex = new IllegalStateException();
+     * when(object1.doStuff()).thenThrow(ex);
+     *
+     * // Act & assert
+     * assertThat(() -> composite.doItAll(),
+     *         throwsException(ex));}
+     * </pre>
+     *
+     * The matcher matches if the actual exception is exactly the same instance as the one
+     * specified via parameter.
+     *
+     * @param exception the expected exception. A null value is allowed, and means that
+     *                  no exception is expected
+     * @return the matcher
+     * @since 1.10.0
+     */
+    public static ExceptionMatcher throwsException(Exception exception)
+    {
+        return ExceptionMatcher.throwsException(exception);
+    }
+
+
+    /**
      * Creates a matcher that matches if the examined procedure throws no exception.
      * <p>
      * For example:
