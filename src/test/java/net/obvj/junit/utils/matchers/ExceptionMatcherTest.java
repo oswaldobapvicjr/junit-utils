@@ -30,6 +30,9 @@ import java.io.IOException;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
+
+import net.obvj.junit.utils.ObjectUtils;
+
 /**
  * Unit tests for the {@link ExceptionMatcher} class.
  *
@@ -78,7 +81,7 @@ class ExceptionMatcherTest
     @Test
     void throwsException_nullWithRunnableNotThrowingException_succeeeds()
     {
-        assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsException(null));
+        assertThat(() -> MESSAGE2.contains(MESSAGE1), throwsException((Exception) null));
     }
 
     @Test
@@ -86,7 +89,7 @@ class ExceptionMatcherTest
     {
         try
         {
-            assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException(null));
+            assertThat(() -> NULL_STRING.equals(MESSAGE1), throwsException((Exception) null));
         }
         catch (AssertionError e)
         {
@@ -94,7 +97,7 @@ class ExceptionMatcherTest
             assertThat(lines[1].trim(), equalTo("Expected:"));
             assertThat(lines[2].trim(), equalTo("no exception"));
             assertThat(lines[3].trim(), equalTo("but:"));
-            assertThat(lines[4].trim(), equalTo("was java.lang.NullPointerException"));
+            assertThat(lines[4].trim(), containsAny("was java.lang.NullPointerException"));
         }
     }
 
@@ -139,6 +142,57 @@ class ExceptionMatcherTest
             String[] lines = extractMessageLines(e);
             assertThat(lines[1].trim(), equalTo("Expected:"));
             assertThat(lines[2].trim(), equalTo("java.lang.Exception"));
+            assertThat(lines[3].trim(), equalTo("but:"));
+            assertThat(lines[4].trim(), equalTo("no exception was thrown"));
+        }
+    }
+
+    @Test
+    void throwsException_exceptionInstaceWithRunnableThrowingTheSameException_success()
+    {
+
+        RuntimeException expectedException = new IllegalArgumentException(IAE_MESSAGE);
+        assertThat(() -> {
+            throw expectedException;
+        }, throwsException(expectedException));
+    }
+
+    @Test
+    void throwsException_exceptionInstanceWithRunnableThrowingAnotherException_failue()
+    {
+        RuntimeException expectedException = new IllegalArgumentException(IAE_MESSAGE);
+        RuntimeException actualException = new IllegalArgumentException(IAE_MESSAGE);
+        try
+        {
+            assertThat(() -> {
+                throw actualException;
+            }, throwsException(expectedException));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo(ObjectUtils.toIdentityString(expectedException)));
+            assertThat(lines[3].trim(), equalTo("but:"));
+            assertThat(lines[4].trim(), equalTo("was " + ObjectUtils.toIdentityString(actualException)));
+        }
+    }
+
+    @Test
+    void throwsException_exceptionInstanceWithRunnableNotThrowingException_failue()
+    {
+        RuntimeException expectedException = new IllegalArgumentException(IAE_MESSAGE);
+        try
+        {
+            assertThat(() -> {
+                return;
+            }, throwsException(expectedException));
+        }
+        catch (AssertionError e)
+        {
+            String[] lines = extractMessageLines(e);
+            assertThat(lines[1].trim(), equalTo("Expected:"));
+            assertThat(lines[2].trim(), equalTo(ObjectUtils.toIdentityString(expectedException)));
             assertThat(lines[3].trim(), equalTo("but:"));
             assertThat(lines[4].trim(), equalTo("no exception was thrown"));
         }

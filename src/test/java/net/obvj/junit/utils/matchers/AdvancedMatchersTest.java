@@ -17,9 +17,7 @@
 package net.obvj.junit.utils.matchers;
 
 import static net.obvj.junit.utils.matchers.AdvancedMatchers.*;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
@@ -57,7 +55,15 @@ class AdvancedMatchersTest
     void throwsException_noArgument_createExceptionMatcherAccordingly()
     {
         ExceptionMatcher matcher = throwsException();
-        assertThat(matcher.getExpectedException(), is(equalTo(Exception.class)));
+        assertThat(matcher.getExpectedExceptionClass(), is(equalTo(Exception.class)));
+    }
+
+    @Test
+    void throwsException_instance_createExceptionMatcherAccordingly()
+    {
+        Exception instance = new RuntimeException(STRING1);
+        ExceptionMatcher matcher = throwsException(instance);
+        assertThat(matcher.getExpectedExceptionInstance(), is(sameInstance(instance)));
     }
 
     @Test
@@ -87,7 +93,7 @@ class AdvancedMatchersTest
     void throwsException_validClass_createExceptionMatcherAccordingly()
     {
         ExceptionMatcher matcher = throwsException(FileNotFoundException.class);
-        assertThat(matcher.getExpectedException(), is(equalTo(FileNotFoundException.class)));
+        assertThat(matcher.getExpectedExceptionClass(), is(equalTo(FileNotFoundException.class)));
     }
 
     @Test
