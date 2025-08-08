@@ -1,5 +1,6 @@
 ![junit-utils logo](resources/junit-utils_logo.svg)
 
+[![Java 8+](https://img.shields.io/badge/Java-8%2B-blue.svg)](https://openjdk.java.net/)
 [![Known Vulnerabilities](https://snyk.io/test/github/oswaldobapvicjr/junit-utils/badge.svg)](https://snyk.io/test/github/oswaldobapvicjr/junit-utils)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/oswaldobapvicjr/junit-utils/maven.yml?branch=master&label=build)](https://github.com/oswaldobapvicjr/junit-utils/actions/workflows/maven.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/oswaldobapvicjr/junit-utils)](https://codecov.io/gh/oswaldobapvicjr/junit-utils)
