@@ -4,7 +4,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/oswaldobapvicjr/junit-utils/badge.svg)](https://snyk.io/test/github/oswaldobapvicjr/junit-utils)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/oswaldobapvicjr/junit-utils/maven.yml?branch=master&label=build)](https://github.com/oswaldobapvicjr/junit-utils/actions/workflows/maven.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/oswaldobapvicjr/junit-utils)](https://codecov.io/gh/oswaldobapvicjr/junit-utils)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils)
+![Maven Central Version](https://img.shields.io/maven-central/v/net.obvj/junit-utils)
 [![Javadoc](https://javadoc.io/badge2/net.obvj/junit-utils/javadoc.svg)](https://javadoc.io/doc/net.obvj/junit-utils)
 
 Common utilities for working with JUnit:
