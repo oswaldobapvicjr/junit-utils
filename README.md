@@ -111,6 +111,11 @@ assertThat(duration.compareTo(otherDuration), isNegative());
 
 ----
 
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/oswaldobapvicjr/junit-utils.svg?variant=adaptive)](https://starchart.cc/oswaldobapvicjr/junit-utils)
+
+----
+
 ## How to include it
 
 If you are using Maven, add **junit-utils** as a dependency in your pom.xml file:
