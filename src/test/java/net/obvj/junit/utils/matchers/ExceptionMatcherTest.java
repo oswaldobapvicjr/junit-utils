@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -887,4 +888,31 @@ class ExceptionMatcherTest
         }
     }
 
+    static class MockedMethod
+    {
+        boolean state = false;
+        public void method()
+        {
+            if(!state)
+            {
+                state = true;
+                throw new RuntimeException("Message");
+            }
+        }
+    }
+
+    @Test
+    void with_methodThatChangeStateOnSecondCall()
+    {
+        MockedMethod mockedMethod = new MockedMethod();
+        try
+        {
+            assertThat(mockedMethod::method, throwsException(RuntimeException.class).withMessage("OtherMessage"));
+            fail("Expected AssertionError");
+        }
+        catch (AssertionError error)
+        {
+            assertThat(error.getMessage(), containsString("the message was \"Message\""));
+        }
+    }
 }

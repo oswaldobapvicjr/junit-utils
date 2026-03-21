@@ -61,7 +61,7 @@ import net.obvj.junit.utils.Procedure;
 public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
 {
     private static final String NO_EXCEPTION = "no exception";
-
+    private Throwable cachedThrowable = null;
     /**
      * Defines different strategies for validating the expected exception.
      *
@@ -777,12 +777,18 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
     {
         try
         {
+            // This function may be called twice. Then the exception is saved in the matcher
+            if (cachedThrowable != null)
+            {
+                throw cachedThrowable;
+            }
             procedure.execute();
             mismatch.appendText(NEW_LINE_INDENT).appendText("no exception was thrown");
             return expectedExceptionClass == null;
         }
         catch (Throwable exception)
         {
+            cachedThrowable = exception;
             return validateFully(exception, mismatch);
         }
     }
