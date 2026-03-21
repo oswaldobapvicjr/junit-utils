@@ -129,3 +129,18 @@ If you are using Maven, add **junit-utils** as a dependency in your pom.xml file
 ```
 
 If you use other dependency management systems (such as Gradle, Grape, Ivy, etc.) click [here](https://maven-badges.herokuapp.com/maven-central/net.obvj/junit-utils).
+
+----
+
+## Contributing
+
+If you want to contribute to the project, check the [issues](http://obvj.net/junit-utils/issues) page, or write an e-mail to [oswaldo@obvj.net](mailto:oswaldo@obvj.net).
+
+Thanks to the people who have already contributed!
+
+<a href="https://github.com/oswaldobapvicjr/junit-utils/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=oswaldobapvicjr/junit-utils"/>
+</a>
+
+<sup>Made with [contrib.rocks](https://contrib.rocks)</sup>
+
