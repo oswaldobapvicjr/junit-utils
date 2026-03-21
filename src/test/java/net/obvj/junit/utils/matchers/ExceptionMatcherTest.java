@@ -909,7 +909,8 @@ class ExceptionMatcherTest
         {
             assertThat(mockedMethod::method, throwsException(RuntimeException.class).withMessage("OtherMessage"));
             fail("Expected AssertionError");
-        } catch (AssertionError error)
+        }
+        catch (AssertionError error)
         {
             assertThat(error.getMessage(), containsString("the message was \"Message\""));
         }

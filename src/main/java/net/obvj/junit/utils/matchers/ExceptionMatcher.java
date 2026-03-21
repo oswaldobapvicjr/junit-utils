@@ -778,7 +778,7 @@ public class ExceptionMatcher extends TypeSafeDiagnosingMatcher<Procedure>
         try
         {
             // This function may be called twice. Then the exception is saved in the matcher
-            if(cachedThrowable != null)
+            if (cachedThrowable != null)
             {
                 throw cachedThrowable;
             }
