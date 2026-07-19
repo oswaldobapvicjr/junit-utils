@@ -38,5 +38,5 @@ We kindly ask that you:
 - Avoid exploiting vulnerabilities in production systems.
 - Coordinate with us to ensure users are protected.
 
-Thank you for helping keep **jsonmerge** secure!
+Thank you for helping keep **junit-utils** secure!
 
