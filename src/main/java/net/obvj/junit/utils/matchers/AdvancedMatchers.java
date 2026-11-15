@@ -399,6 +399,40 @@ public class AdvancedMatchers
     }
 
     /**
+     * Creates a matcher that matches if the examined string matches <b>any</b> of the
+     * specified regular expressions.
+     * <p>
+     * Each pattern must match the entire string, as in {@link String#matches(String)}.
+     * <p>
+     * For example:
+     *
+     * <blockquote>
+     * <pre>
+     * assertThat("the quick brown fox", matchesAny(".*fox", "dragon"))
+     * </pre>
+     * </blockquote>
+     *
+     * By default, the matcher is <b>case-sensitive</b>, but this behavior can be modified
+     * with an additional method call.
+     * <p>
+     * For example:
+     *
+     * <blockquote>
+     * <pre>
+     * assertThat("the quick brown fox", matchesAny("THE .* FOX", "dragon").ignoreCase())
+     * </pre>
+     * </blockquote>
+     *
+     * @param patterns the regular expressions to be tested
+     * @return the matcher
+     * @since 1.11.0
+     */
+    public static StringMatcher matchesAny(String... patterns)
+    {
+        return StringMatcher.matchesAny(patterns);
+    }
+
+    /**
      * A matcher that matches if a {@link Number} is positive.
      * <p>
      * This is particularly useful in situations where the exact value of an operation is
