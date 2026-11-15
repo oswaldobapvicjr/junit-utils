@@ -18,13 +18,15 @@ package net.obvj.junit.utils.matchers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 /**
  * A Matcher that evaluates the content of a string of characters against one or more
- * substrings.
+ * substrings or regular expressions.
  *
  * @author oswaldo.bapvic.jr
  * @since 1.1.0
@@ -32,10 +34,12 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
 {
     private static final String EXPECTED_SCENARIO = "a string containing %s of the specified substrings %s";
+    private static final String EXPECTED_PATTERN_SCENARIO = "a string matching %s of the specified patterns %s";
     private static final String EXPECTED_STRING_NOT_FOUND = "the substring \"%s\" was not found in: \"%s\"";
     private static final String EXPECTED_STRING_NOT_FOUND_AFTER = "the substring \"%s\" was not found after \"%s\" in: \"%s\"";
     private static final String NONE_OF_THE_STRINGS_FOUND = "none of the specified substrings was found in: \"%s\"";
     private static final String UNEXPECTED_STRING_FOUND = "the unexpected string \"%s\" was found in: \"%s\"";
+    private static final String NONE_OF_THE_PATTERNS_MATCHES = "none of the specified patterns matches: \"%s\"";
 
     /**
      * Defines the matching strategy to be applied.
@@ -146,6 +150,42 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
                 }
                 return true;
             }
+        },
+
+        /**
+         * Matches if the tested string matches any of the specified regular expressions.
+         *
+         * @since 1.11.0
+         */
+        ANY_PATTERN
+        {
+            @Override
+            public boolean evaluate(String string, List<String> patterns, CaseStrategy caseStrategy,
+                    Description mismatch)
+            {
+                // Compile all patterns first, so an invalid one fails even when another one matches
+                List<Pattern> compiledPatterns = patterns.stream().map(caseStrategy::compile)
+                        .collect(Collectors.toList());
+
+                if (compiledPatterns.stream().anyMatch(pattern -> pattern.matcher(string).matches()))
+                {
+                    return true;
+                }
+                mismatch.appendText(String.format(NONE_OF_THE_PATTERNS_MATCHES, string));
+                return false;
+            }
+
+            @Override
+            public String expectedScenario()
+            {
+                return EXPECTED_PATTERN_SCENARIO;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "ANY";
+            }
         };
 
         /**
@@ -158,6 +198,17 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
          */
         public abstract boolean evaluate(String string, List<String> substrings, CaseStrategy caseStrategy,
                 Description mismatch);
+
+        /**
+         * Returns the format string for the "expected" part of the test description.
+         *
+         * @return the format string, taking the strategy and the substrings as arguments
+         * @since 1.11.0
+         */
+        public String expectedScenario()
+        {
+            return EXPECTED_SCENARIO;
+        }
     }
 
     /**
@@ -181,6 +232,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
             {
                 return string != null ? string.indexOf(substring, fromIndex): -1;
             }
+
+            @Override
+            public Pattern compile(String regex)
+            {
+                return Pattern.compile(regex);
+            }
         },
 
         /**
@@ -198,6 +255,12 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
             public int indexOf(String string, String substring, int fromIndex)
             {
                 return string != null && substring != null ? string.toLowerCase().indexOf(substring.toLowerCase(), fromIndex): -1;
+            }
+
+            @Override
+            public Pattern compile(String regex)
+            {
+                return Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
             }
         };
 
@@ -229,6 +292,16 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
          * @since 1.9.0
          */
         public abstract int indexOf(String string, String substring, int fromIndex);
+
+        /**
+         * Compiles the specified regular expression into a pattern.
+         *
+         * @param regex the expression to be compiled
+         * @return the compiled pattern
+         * @throws java.util.regex.PatternSyntaxException if the expression's syntax is invalid
+         * @since 1.11.0
+         */
+        public abstract Pattern compile(String regex);
     }
 
     private final Strategy strategy;
@@ -325,6 +398,31 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     }
 
     /**
+     * Creates a matcher that matches if the examined string matches <b>any</b> of the
+     * specified regular expressions.
+     * <p>
+     * Each pattern must match the entire string, as in {@link String#matches(String)}.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * assertThat("the quick brown fox", matchesAny(".*fox", "dragon")) //PASS
+     * assertThat("the quick brown fox", matchesAny("fox", "dragon"))   //FAIL
+     * </pre>
+     *
+     * An invalid pattern causes a {@link java.util.regex.PatternSyntaxException} when the
+     * matcher is evaluated.
+     *
+     * @param patterns the regular expressions to be tested
+     * @return the matcher
+     * @since 1.11.0
+     */
+    public static StringMatcher matchesAny(String... patterns)
+    {
+        return new StringMatcher(Strategy.ANY_PATTERN, CaseStrategy.DEFAULT, patterns);
+    }
+
+    /**
      * Tells the matcher to compare strings irrespective of case.
      * <p>
      * For example:
@@ -362,7 +460,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     @Override
     public void describeTo(Description description)
     {
-        description.appendText(String.format(EXPECTED_SCENARIO, strategy, substrings));
+        description.appendText(String.format(strategy.expectedScenario(), strategy, substrings));
         if (caseStrategy != CaseStrategy.DEFAULT)
         {
             description.appendText(" (").appendText(caseStrategy.description).appendText(")");
