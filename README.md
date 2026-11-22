@@ -98,6 +98,7 @@ assertThat("The quick brown fox jumps over the lazy dog", containsAll("dog", "fo
 assertThat("The quick brown fox jumps over the lazy dog", containsAny("FOX", "dragon").ignoreCase());
 assertThat("The quick brown fox jumps over the lazy dog", containsNone("centaur"));
 assertThat("The quick brown fox jumps over the lazy dog", containsAllInSequence("fox", "dog"));
+assertThat("The quick brown fox jumps over the lazy dog", matchesAny(".*fox.*", "dragon"));
 ```
 
 ### Testing numbers
