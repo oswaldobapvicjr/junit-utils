@@ -408,7 +408,9 @@ public class AdvancedMatchers
      *
      * <blockquote>
      * <pre>
-     * assertThat("the quick brown fox", matchesAny(".*fox", "dragon"))
+     * assertThat("Transaction a1b2c3d4-e5f6 failed",
+     *         matchesAny("Transaction \\w{8}-\\w{4} failed",
+     *                    "Transaction failed"))
      * </pre>
      * </blockquote>
      *
@@ -419,7 +421,8 @@ public class AdvancedMatchers
      *
      * <blockquote>
      * <pre>
-     * assertThat("the quick brown fox", matchesAny("THE .* FOX", "dragon").ignoreCase())
+     * assertThat("the quick brown fox",
+     *         matchesAny("THE .* FOX", "dragon").ignoreCase())
      * </pre>
      * </blockquote>
      *
