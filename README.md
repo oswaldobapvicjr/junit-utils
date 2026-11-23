@@ -98,7 +98,16 @@ assertThat("The quick brown fox jumps over the lazy dog", containsAll("dog", "fo
 assertThat("The quick brown fox jumps over the lazy dog", containsAny("FOX", "dragon").ignoreCase());
 assertThat("The quick brown fox jumps over the lazy dog", containsNone("centaur"));
 assertThat("The quick brown fox jumps over the lazy dog", containsAllInSequence("fox", "dog"));
-assertThat("The quick brown fox jumps over the lazy dog", matchesAny(".*fox.*", "dragon"));
+```
+
+#### Matching against RegEx patterns
+
+This is particularly useful when a string can legitimately take multiple formats and you only need at least one regular expression to match.
+
+```java
+assertThat("File file.json not found",         matchesAny("File .* not found"));
+assertThat("HTTP-404: Not Found",              matchesAny("HTTP-\\d{3}.*", "test"));
+assertThat("Transaction a1b2c3d4-e5f6 failed", matchesAny("Transaction \\w{8}-\\w{4} failed"));
 ```
 
 ### Testing numbers

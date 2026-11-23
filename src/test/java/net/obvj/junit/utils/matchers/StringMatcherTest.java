@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Unit tests for the {@link StringMatcher} class.
@@ -149,12 +151,23 @@ class StringMatcherTest
                 "     but: the substring \"fox\" was not found after \"dog\" in: \"" + THE_QUICK_BROWN_FOX + "\"");
     }
 
-    @Test
-    void matchesAny_onePatternMatches_success()
+    @ParameterizedTest
+    @CsvSource(
+        delimiter = '|',
+        value = {
+            "The quick brown fox jumps over the lazy dog | dragon | .*fox.*",
+            "File file.json not found | File .* not found | test",
+            "HTTP-404: Not Found | HTTP-\\d{3}.* | test",
+            "BR-2026-AB-123456 | test | BR-\\d{4}-[A-Z]{2}-\\d{6}",
+            "Transaction a1b2c3d4-e5f6 failed: Invalid card | Transaction \\w{8}-\\w{4} failed: Invalid card | Payment rejected for transaction \\w{8}-\\w{4}",
+            "Payment rejected for transaction 9876abcd-0011 | Transaction \\w{8}-\\w{4} failed: Invalid card | Payment rejected for transaction \\w{8}-\\w{4}"
+        }
+    )
+    void matchesAny_onePatternMatches_success(String input, String pattern1, String pattern2)
     {
-        assertThat(THE_QUICK_BROWN_FOX, matchesAny(DRAGON, ".*fox.*"));
+        assertThat(input, matchesAny(pattern1, pattern2));
     }
-
+    
     @Test
     void matchesAny_patternMatchesOnlyPartOfTheString_fails()
     {
