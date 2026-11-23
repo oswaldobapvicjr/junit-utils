@@ -157,6 +157,14 @@ class AdvancedMatchersTest
     }
 
     @Test
+    void matchesAll_moreThanOnePattern_createStringMatcherAccordingly()
+    {
+        StringMatcher matcher = matchesAll(STRING1, STRING2);
+        assertThat(matcher.getStrategy(), is(equalTo(Strategy.ALL_PATTERNS)));
+        assertThat(matcher.getSubstrings(), is(equalTo(Arrays.asList(STRING1, STRING2))));
+    }
+
+    @Test
     void isPositive_validNumbers_validatesAccordingly()
     {
         assertThat(Integer.MAX_VALUE, isPositive());
