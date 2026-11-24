@@ -22,6 +22,7 @@ import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsNone;
 import static net.obvj.junit.utils.matchers.StringMatcher.matchesAll;
 import static net.obvj.junit.utils.matchers.StringMatcher.matchesAny;
+import static net.obvj.junit.utils.matchers.StringMatcher.matchesNone;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -263,6 +264,67 @@ class StringMatcherTest
     void matchesAll_nullInput_fails()
     {
         assertThrows(AssertionError.class, () -> assertThat(null, matchesAll(FOX)));
+    }
+
+    @Test
+    void matchesNone_noneOfPatternsMatches_success()
+    {
+        assertThat("2026-11-23T10:00:00Z [INFO] Request completed",
+                matchesNone(".*\\[ERROR\\].*", ".*FATAL.*"));
+    }
+
+    @Test
+    void matchesNone_onePatternMatches_fails()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, matchesNone(".*dragon", ".*manticore"));
+    }
+
+    @Test
+    void matchesNone_onePatternMatches_mismatchNamesThePattern()
+    {
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, matchesNone(".*fox.*")));
+        assertLines(error.getMessage(), "",
+                "Expected: a string matching NONE of the specified patterns [.*fox.*]",
+                "     but: the pattern \".*fox.*\" matches: \"" + THE_QUICK_BROWN_FOX + "\"");
+    }
+
+    @Test
+    void matchesNone_ignoreCase_success()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, matchesNone(".*DRAGON", ".*MANTICORE").ignoreCase());
+    }
+
+    @Test
+    void matchesNone_ignoreCaseAndOnePatternMatches_fails()
+    {
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, matchesNone(".*FOX.*").ignoreCase()));
+        assertLines(error.getMessage(), "",
+                "Expected: a string matching NONE of the specified patterns [.*FOX.*] (ignore case)",
+                "     but: the pattern \".*FOX.*\" matches: \"" + THE_QUICK_BROWN_FOX + "\"");
+    }
+
+    @Test
+    void matchesNone_noPatterns_success()
+    {
+        assertThat(THE_QUICK_BROWN_FOX, matchesNone());
+    }
+
+    @Test
+    void matchesNone_invalidPattern_throwsPatternSyntaxException()
+    {
+        assertThrows(PatternSyntaxException.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, matchesNone("[")));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "2026-11-23T10:00:00Z [INFO] Request completed|.*\\[ERROR\\].*|.*FATAL.*",
+            "user_123|^admin_.*|.*\\s+.*" })
+    void matchesNone_usageScenarios_success(String input, String pattern1, String pattern2)
+    {
+        assertThat(input, matchesNone(pattern1, pattern2));
     }
 
     void assertLines(String actualString, String... expectedlines)
