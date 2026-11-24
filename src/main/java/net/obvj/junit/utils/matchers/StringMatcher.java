@@ -41,6 +41,7 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     private static final String UNEXPECTED_STRING_FOUND = "the unexpected string \"%s\" was found in: \"%s\"";
     private static final String NONE_OF_THE_PATTERNS_MATCHES = "none of the specified patterns matches: \"%s\"";
     private static final String PATTERN_NOT_MATCHED = "the pattern \"%s\" does not match: \"%s\"";
+    private static final String UNEXPECTED_PATTERN_MATCHED = "the pattern \"%s\" matches: \"%s\"";
 
 
     /**
@@ -226,6 +227,45 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
                     public String toString()
                     {
                         return "ALL";
+                    }
+                },
+
+        /**
+         * Matches if the tested string matches none of the specified regular expressions.
+         *
+         * @since 1.11.0
+         */
+        NONE_PATTERNS
+                {
+                    @Override
+                    public boolean evaluate(String string, List<String> patterns, CaseStrategy caseStrategy,
+                                            Description mismatch)
+                    {
+                        // Compile all patterns first, so an invalid one fails even when another one matches
+                        List<Pattern> compiledPatterns = patterns.stream().map(caseStrategy::compile)
+                                .collect(Collectors.toList());
+
+                        for (int i = 0; i < compiledPatterns.size(); i++)
+                        {
+                            if (compiledPatterns.get(i).matcher(string).matches())
+                            {
+                                mismatch.appendText(String.format(UNEXPECTED_PATTERN_MATCHED, patterns.get(i), string));
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public String expectedScenario()
+                    {
+                        return EXPECTED_PATTERN_SCENARIO;
+                    }
+
+                    @Override
+                    public String toString()
+                    {
+                        return "NONE";
                     }
                 };
 
@@ -486,6 +526,31 @@ public class StringMatcher extends TypeSafeDiagnosingMatcher<String>
     public static StringMatcher matchesAll(String... patterns)
     {
         return new StringMatcher(Strategy.ALL_PATTERNS, CaseStrategy.DEFAULT, patterns);
+    }
+
+    /**
+     * Creates a matcher that matches if the examined string matches <b>none</b> of the
+     * specified regular expressions.
+     * <p>
+     * Each pattern must match the entire string, as in {@link String#matches(String)}.
+     * <p>
+     * For example:
+     *
+     * <pre>
+     * assertThat("the quick brown fox", matchesNone(".*dragon", ".*manticore")) //PASS
+     * assertThat("the quick brown fox", matchesNone(".*fox", ".*dragon"))       //FAIL
+     * </pre>
+     *
+     * An invalid pattern causes a {@link java.util.regex.PatternSyntaxException} when the
+     * matcher is evaluated.
+     *
+     * @param patterns the regular expressions to be tested
+     * @return the matcher
+     * @since 1.11.0
+     */
+    public static StringMatcher matchesNone(String... patterns)
+    {
+        return new StringMatcher(Strategy.NONE_PATTERNS, CaseStrategy.DEFAULT, patterns);
     }
 
     /**

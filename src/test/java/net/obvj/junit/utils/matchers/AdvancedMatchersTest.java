@@ -165,6 +165,14 @@ class AdvancedMatchersTest
     }
 
     @Test
+    void matchesNone_moreThanOnePattern_createStringMatcherAccordingly()
+    {
+        StringMatcher matcher = matchesNone(STRING1, STRING2);
+        assertThat(matcher.getStrategy(), is(equalTo(Strategy.NONE_PATTERNS)));
+        assertThat(matcher.getSubstrings(), is(equalTo(Arrays.asList(STRING1, STRING2))));
+    }
+
+    @Test
     void isPositive_validNumbers_validatesAccordingly()
     {
         assertThat(Integer.MAX_VALUE, isPositive());

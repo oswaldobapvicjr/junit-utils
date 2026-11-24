@@ -119,7 +119,15 @@ assertThat("2026-11-22T21:35:00Z [ERROR] Failed to process request for userId=48
 assertThat("BR-2026-AB-123456", matchesAll("^BR-\\d{4}-.*", ".*-[A-Z]{2}-\\d{6}$"));
 ```
 
-Both matchers require each pattern to match the **entire** string, and both support `.ignoreCase()`.
+Use `matchesNone` when a string must avoid every prohibited pattern, such as error signatures or disallowed formats:
+
+```java
+assertThat("2026-11-23T10:00:00Z [INFO] Request completed",
+        matchesNone(".*\\[ERROR\\].*", ".*FATAL.*"));
+assertThat("user_123", matchesNone("^admin_.*", ".*\\s+.*"));
+```
+
+All three matchers require each pattern to match the **entire** string, and all support `.ignoreCase()`.
 
 ### Testing numbers
 

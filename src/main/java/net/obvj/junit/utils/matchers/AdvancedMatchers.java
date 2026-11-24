@@ -472,6 +472,45 @@ public class AdvancedMatchers
     }
 
     /**
+     * Creates a matcher that matches if the examined string matches <b>none</b> of the
+     * specified regular expressions.
+     * <p>
+     * Each pattern must match the entire string, as in {@link String#matches(String)}.
+     * <p>
+     * For example:
+     *
+     * <blockquote>
+     * <pre>
+     * assertThat("2026-11-23T10:00:00Z [INFO] Request completed",
+     *         matchesNone(".*\\[ERROR\\].*", ".*FATAL.*"))
+     * </pre>
+     * </blockquote>
+     *
+     * By default, the matcher is <b>case-sensitive</b>, but this behavior can be modified
+     * with an additional method call.
+     * <p>
+     * For example:
+     *
+     * <blockquote>
+     * <pre>
+     * assertThat("The quick brown fox",
+     *         matchesNone(".*DRAGON").ignoreCase())
+     * </pre>
+     * </blockquote>
+     *
+     * An invalid pattern causes a {@link java.util.regex.PatternSyntaxException} when the
+     * matcher is evaluated.
+     *
+     * @param patterns the regular expressions to be tested
+     * @return the matcher
+     * @since 1.11.0
+     */
+    public static StringMatcher matchesNone(String... patterns)
+    {
+        return StringMatcher.matchesNone(patterns);
+    }
+
+    /**
      * A matcher that matches if a {@link Number} is positive.
      * <p>
      * This is particularly useful in situations where the exact value of an operation is
