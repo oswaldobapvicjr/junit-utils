@@ -110,6 +110,17 @@ assertThat("HTTP-404: Not Found",              matchesAny("HTTP-\\d{3}.*", "test
 assertThat("Transaction a1b2c3d4-e5f6 failed", matchesAny("Transaction \\w{8}-\\w{4} failed"));
 ```
 
+Use `matchesAll` when a string must satisfy multiple independent constraints simultaneously (e.g., password rules, structured identifiers with both prefix and suffix patterns, or log entries containing multiple required formats):
+
+```java
+assertThat("The quick brown fox jumps over the lazy dog", matchesAll(".*fox.*", ".*dog$"));
+assertThat("2026-11-22T21:35:00Z [ERROR] Failed to process request for userId=48291",
+        matchesAll(".*\\[ERROR\\].*", ".*userId=\\d+.*"));
+assertThat("BR-2026-AB-123456", matchesAll("^BR-\\d{4}-.*", ".*-[A-Z]{2}-\\d{6}$"));
+```
+
+Both matchers require each pattern to match the **entire** string, and both support `.ignoreCase()`.
+
 ### Testing numbers
 
 Sometimes, it's more meaningful to check whether a number is positive or negative than testing the value itself, especially in situations where the exact value is unpredictable:

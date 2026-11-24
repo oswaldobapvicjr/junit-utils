@@ -20,6 +20,7 @@ import static net.obvj.junit.utils.matchers.StringMatcher.containsAll;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsAllInSequence;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsAny;
 import static net.obvj.junit.utils.matchers.StringMatcher.containsNone;
+import static net.obvj.junit.utils.matchers.StringMatcher.matchesAll;
 import static net.obvj.junit.utils.matchers.StringMatcher.matchesAny;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
@@ -199,6 +200,69 @@ class StringMatcherTest
     {
         assertThrows(PatternSyntaxException.class,
                 () -> assertThat(THE_QUICK_BROWN_FOX, matchesAny(".*fox.*", "[")));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            delimiter = '|',
+            value = {
+                    "The quick brown fox jumps over the lazy dog | .*fox.* | .*dog$",
+                    "2026-11-22T21:35:00Z [ERROR] Failed to process request for userId=48291 | .*\\[ERROR\\].* | .*userId=\\d+.*",
+                    "BR-2026-AB-123456 | ^BR-\\d{4}-.* | .*-[A-Z]{2}-\\d{6}$"
+            }
+    )
+    void matchesAll_allPatternsMatch_success(String input, String pattern1, String pattern2)
+    {
+        assertThat(input, matchesAll(pattern1, pattern2));
+    }
+
+    @Test
+    void matchesAll_onePatternDoesNotMatch_fails()
+    {
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, matchesAll(".*fox.*", ".*dragon.*")));
+        assertLines(error.getMessage(), "",
+                "Expected: a string matching ALL of the specified patterns [.*fox.*, .*dragon.*]",
+                "     but: the pattern \".*dragon.*\" does not match: \"" + THE_QUICK_BROWN_FOX + "\"");
+    }
+
+    @Test
+    void matchesAll_patternMatchesOnlyPartOfTheString_fails()
+    {
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, matchesAll(FOX)));
+        assertLines(error.getMessage(), "",
+                "Expected: a string matching ALL of the specified patterns [fox]",
+                "     but: the pattern \"fox\" does not match: \"" + THE_QUICK_BROWN_FOX + "\"");
+    }
+
+    @Test
+    void matchesAll_ignoreCaseAndNonAsciiCharacters_success()
+    {
+        assertThat("Arquivo não encontrado", matchesAll("ARQUIVO.*", ".*NÃO ENCONTRADO").ignoreCase());
+    }
+
+    @Test
+    void matchesAll_ignoreCaseAndOnePatternDoesNotMatch_fails()
+    {
+        AssertionError error = assertThrows(AssertionError.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, matchesAll(".*FOX.*", ".*DRAGON.*").ignoreCase()));
+        assertLines(error.getMessage(), "",
+                "Expected: a string matching ALL of the specified patterns [.*FOX.*, .*DRAGON.*] (ignore case)",
+                "     but: the pattern \".*DRAGON.*\" does not match: \"" + THE_QUICK_BROWN_FOX + "\"");
+    }
+
+    @Test
+    void matchesAll_invalidPatternAfterANonMatchingOne_throwsPatternSyntaxException()
+    {
+        assertThrows(PatternSyntaxException.class,
+                () -> assertThat(THE_QUICK_BROWN_FOX, matchesAll(".*dragon.*", "[")));
+    }
+
+    @Test
+    void matchesAll_nullInput_fails()
+    {
+        assertThrows(AssertionError.class, () -> assertThat(null, matchesAll(FOX)));
     }
 
     void assertLines(String actualString, String... expectedlines)
